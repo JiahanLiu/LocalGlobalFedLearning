@@ -31,7 +31,13 @@ def cat_boost(model_file, accuracy_file, features_df, labels):
 
     X_train, X_test, y_train, y_test = train_test_split(features_df, label_encoded, test_size=0.2, random_state=3)
 
-    clf = CatBoostClassifier(random_seed=3, custom_loss='TotalF1', loss_function='MultiClass', od_type='Iter', od_wait=20)
+    clf = CatBoostClassifier(random_seed=3, 
+        custom_loss='TotalF1', 
+        loss_function='MultiClass', 
+        od_type='Iter', 
+        od_wait=20,
+        # task_type="GPU",
+        )
     if path.exists(model_file):
         clf = pickle.load(open(model_file, 'rb'))
     else:
@@ -40,7 +46,7 @@ def cat_boost(model_file, accuracy_file, features_df, labels):
 
     score = f1_score(y_test, clf.predict(X_test), average='macro')
     print("Finished" + model_file)
-    
+
     with open(accuracy_file, mode='w+') as file: 
         file.write('F1 on testset:\t{:.4f}\n'.format(score))
 

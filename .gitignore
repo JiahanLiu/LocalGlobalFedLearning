@@ -1,2 +1,7 @@
-/Data/
 .DS_Store
+.vscode/
+**/catboost_training.json
+*.tsv
+*.tfevents
+**/catboost_info
+*.tmp
