@@ -6,7 +6,13 @@ Our first chosen dataset is the [Human Activity Recognition](https://archive.ics
 This dataset is also used in Federated Multi-Task Learning(https://arxiv.org/pdf/1705.10467.pdf). This is found in the HumanActivity folder from the base folder.
 We start by performing exploratory data anlysis using PCA and then use [Catboost](https://github.com/catboost/catboost) to create a baseline to see if local models perform better than global models.
 
-## Human
+## Human Activity Dataset
 
-## Exploratory Data Analysis
+### Exploratory Data Analysis
+
+PCA Results We also apply T-distributed Stochastic Neighbor Embedding to visualized the results in 2 dimensions. 
+
+Catboost Results
+![Catboost Results](https://github.com/JiahanLiu/HumanActivityFederated/blob/master/eda/results/CatboostResults.png)
+
 
