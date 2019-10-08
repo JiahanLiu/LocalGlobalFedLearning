@@ -7,7 +7,7 @@ import pandas as pd
 
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 
 from catboost import Pool, CatBoostClassifier, cv
 
@@ -44,13 +44,16 @@ def cat_boost(model_file, accuracy_file, features_df, labels):
         clf.fit(X_train, y_train)
         pickle.dump(clf, open(model_file, 'wb'))
 
-    score = f1_score(y_test, clf.predict(X_test), average='macro')
+    f1_result = f1_score(y_test, clf.predict(X_test), average='macro')
+    accuracy_result = accuracy_score(y_test, clf.predict(X_test))
     print("Finished" + model_file)
 
     with open(accuracy_file, mode='w+') as file: 
-        file.write('F1 on testset:\t{:.4f}\n'.format(score))
+        file.write('F1 on testset:\t{:.4f}\n'.format(f1_result))
+        file.write('Accuracy on testset:\t{:.4f}\n'.format(accuracy_result))
 
-    print('F1 on testset:\t{:.4f}\n'.format(score))
+    print('F1 on testset:\t{:.4f}\n'.format(f1_result))
+    print('Accuracy on testset:\t{:.4f}\n'.format(accuracy_result))
 
 def local_catboost():
     model_file_p1 = RESULTS_PATH + 'catboost_'
