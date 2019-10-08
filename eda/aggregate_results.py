@@ -1,6 +1,6 @@
 import csv
 
-RESULTS_DIR = "results/"
+RESULTS_DIR = "catboost_results/"
 AGGREGATE_PATH = RESULTS_DIR + "catboost.csv"
 
 def gen_csv(file_path):
