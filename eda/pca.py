@@ -14,7 +14,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 DATA_PATH = "../data/"
-RESULTS_PATH = "results/"
+RESULTS_PATH = "pca_results/"
 
 train_df = pd.read_csv(DATA_PATH + 'train.csv')
 test_df = pd.read_csv(DATA_PATH + 'test.csv')
@@ -98,3 +98,5 @@ def activity_pca():
     axarr[1].set_title('TSNE: Participant Visualisation')
     plt.savefig(RESULTS_PATH + 'ActivitySeperable.pdf')
     plt.show()
+
+activity_pca()

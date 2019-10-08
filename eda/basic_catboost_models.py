@@ -14,7 +14,7 @@ from catboost import Pool, CatBoostClassifier, cv
 import pickle
 
 DATA_PATH = "../data/"
-RESULTS_PATH = "results/"
+RESULTS_PATH = "catboost_results/"
 
 train_df = pd.read_csv(DATA_PATH + 'train.csv')
 test_df = pd.read_csv(DATA_PATH + 'test.csv')
@@ -113,4 +113,3 @@ def catboost_all():
     catboost_global()
 
 catboost_all()
-
