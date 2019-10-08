@@ -2,28 +2,19 @@ import os.path
 from os import path
 
 import numpy as np
-
 import pandas as pd
 
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score
-
 from catboost import Pool, CatBoostClassifier, cv
-
 import pickle
 
-DATA_PATH = "../data/"
+import dataset_split
+
 RESULTS_PATH = "catboost_results/"
 
-train_df = pd.read_csv(DATA_PATH + 'train.csv')
-test_df = pd.read_csv(DATA_PATH + 'test.csv')
-
-both_df = pd.concat([train_df, test_df], axis=0).reset_index(drop=True)
-all_features_df = both_df.copy()
-
-all_features_df.pop('subject')
-all_labels = all_features_df.pop('Activity')
+all_features_df, all_labels, both_df = dataset_split.feature_label_split()
 
 def cat_boost(model_file, accuracy_file, features_df, labels):
     enc = LabelEncoder()
@@ -65,6 +56,7 @@ def local_catboost():
     for i in range(1, 31):
         model_file = model_file_p1 + str(i) + model_file_p2
         accuracy_file = accuracy_file_p1 + str(i) + accuracy_file_p2
+
         local_df = both_df.loc[both_df['subject'] == i]
         
         local_df.pop('subject')

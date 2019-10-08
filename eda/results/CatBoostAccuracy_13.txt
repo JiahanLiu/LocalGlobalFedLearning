@@ -1,2 +1,0 @@
-F1 on testset:	1.0000
-Accuracy on testset:	1.0000

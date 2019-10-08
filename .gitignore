@@ -5,3 +5,4 @@
 *.tfevents
 **/catboost_info
 *.tmp
+*/__pycache__/
