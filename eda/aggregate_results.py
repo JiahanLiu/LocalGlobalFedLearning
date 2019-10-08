@@ -5,26 +5,38 @@ AGGREGATE_PATH = RESULTS_DIR + "catboost.csv"
 
 def gen_csv(file_path):
     with open(file_path, 'wb') as csvfile:
-        global_f1_error = 1 - gen_global_catboost()
-        local_f1_error = 1 - gen_local_catboost()
-        node5_f1_error = 1 - gen_group_catboost()
+        global_f1, global_acc = gen_global_catboost()
+        local_f1, local_acc = gen_local_catboost()
+        node5_f1, node5_acc = gen_group_catboost()
         filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        filewriter.writerow(['Average Prediction Error Percentage'])
+        filewriter.writerow(['Model', 'Human Activity'])
+        filewriter.writerow(['Global', str((1-global_acc) * 100)])
+        filewriter.writerow(['5 Node', str((1-local_acc) * 100)])
+        filewriter.writerow(['Local', str((1-node5_acc) * 100)])
+
+        filewriter.writerow([''])
+
         filewriter.writerow(['1 - F1 Scores Percentage'])
         filewriter.writerow(['Model', 'Human Activity'])
-        filewriter.writerow(['Global', str(global_f1_error * 100)])
-        filewriter.writerow(['5 Node', str(node5_f1_error * 100)])
-        filewriter.writerow(['Local', str(local_f1_error * 100)])
+        filewriter.writerow(['Global', str((1-global_f1) * 100)])
+        filewriter.writerow(['5 Node', str((1-local_f1) * 100)])
+        filewriter.writerow(['Local', str((1-node5_f1) * 100)])
 
 def avg_accuracy_catboost(catboost_files_list):
-    sum = 0
+    f1_sum = 0
+    accuracy_sum = 0
 
     for accuracy_file in catboost_files_list:    
         with open(accuracy_file, 'r') as file:
-            line = file.readline()
-            index = line.index(':')
-            sum += float(line[index+2:])
+            f1_line = file.readline()
+            f1_index = f1_line.index(':')
+            f1_sum += float(f1_line[f1_index+2:])
+            accuracy_line = file.readline()
+            accuracy_index = accuracy_line.index(':')
+            accuracy_sum += float(accuracy_line[accuracy_index+2:])
 
-    return sum/len(catboost_files_list)
+    return f1_sum/len(catboost_files_list), accuracy_sum/len(catboost_files_list)
 
 def gen_local_catboost():
     local_catboost_results = []

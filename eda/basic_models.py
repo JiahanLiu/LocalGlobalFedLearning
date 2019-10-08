@@ -36,7 +36,8 @@ def cat_boost(model_file, accuracy_file, features_df, labels):
         loss_function='MultiClass', 
         od_type='Iter', 
         od_wait=20,
-        # task_type="GPU",
+        task_type="GPU",
+        devices='0',
         )
     if path.exists(model_file):
         clf = pickle.load(open(model_file, 'rb'))
@@ -91,9 +92,7 @@ def group_catboost5():
 
         cat_boost(model_file, accuracy_file, local_df, local_labels)
 
-group_catboost5()
-
-def catboost_all():
+def catboost_global():
     model_file_p1 = RESULTS_PATH + 'catboost_'
     model_file_p2 = '.catboost'
     accuracy_file_p1 = RESULTS_PATH + 'CatBoostAccuracy_'
@@ -110,7 +109,9 @@ def catboost_all():
 
     cat_boost(dicts[0]["model_file"], dicts[0]["accuracy_file"], dicts[0]["features"], dicts[0]["labels"])
 
-
-
+def catboost_all():
+    group_catboost5()
+    local_catboost()
+    catboost_global()
 
 
