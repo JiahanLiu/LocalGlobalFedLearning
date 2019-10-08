@@ -1,0 +1,11 @@
+Average Prediction Error Percentage
+Model,Human Activity
+Global,1.5000000000000013
+5 Node,0.8140000000000036
+Local,0.28333333333333544
+""
+1 - F1 Scores Percentage
+Model,Human Activity
+Global,1.4900000000000024
+5 Node,0.8379999999999832
+Local,0.28366666666667095
