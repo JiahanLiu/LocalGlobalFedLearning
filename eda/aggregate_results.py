@@ -4,24 +4,24 @@ RESULTS_DIR = "results/"
 AGGREGATE_PATH = RESULTS_DIR + "catboost.csv"
 
 def gen_csv(file_path):
-    with open(file_path, 'wb') as csvfile:
+    with open(file_path, 'w') as csvfile:
         global_f1, global_acc = gen_global_catboost()
         local_f1, local_acc = gen_local_catboost()
         node5_f1, node5_acc = gen_group_catboost()
-        filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        filewriter = csv.writer(csvfile, delimiter=',')
         filewriter.writerow(['Average Prediction Error Percentage'])
         filewriter.writerow(['Model', 'Human Activity'])
         filewriter.writerow(['Global', str((1-global_acc) * 100)])
-        filewriter.writerow(['5 Node', str((1-local_acc) * 100)])
-        filewriter.writerow(['Local', str((1-node5_acc) * 100)])
+        filewriter.writerow(['5 Node', str((1-node5_acc) * 100)])
+        filewriter.writerow(['Local', str((1-local_acc) * 100)])
 
         filewriter.writerow([''])
 
         filewriter.writerow(['1 - F1 Scores Percentage'])
         filewriter.writerow(['Model', 'Human Activity'])
         filewriter.writerow(['Global', str((1-global_f1) * 100)])
-        filewriter.writerow(['5 Node', str((1-local_f1) * 100)])
-        filewriter.writerow(['Local', str((1-node5_f1) * 100)])
+        filewriter.writerow(['5 Node', str((1-node5_f1) * 100)])
+        filewriter.writerow(['Local', str((1-local_f1) * 100)])
 
 def avg_accuracy_catboost(catboost_files_list):
     f1_sum = 0
