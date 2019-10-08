@@ -72,8 +72,6 @@ def local_catboost():
 
         cat_boost(model_file, accuracy_file, local_df, local_labels)
 
-local_catboost()
-
 def group_catboost5():
     model_file_p1 = RESULTS_PATH + 'catboost_'
     model_file_p2 = '.catboost'
@@ -114,4 +112,5 @@ def catboost_all():
     local_catboost()
     catboost_global()
 
+catboost_all()
 
