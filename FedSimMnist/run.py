@@ -47,12 +47,13 @@ test_dataset = datasets.MNIST(
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE_TRAIN, shuffle=True)
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE_TEST, shuffle=False)
 
-simple_net = nn_architectures.NetFC().to(device=DEVICE)
+local_net = nn_architectures.NetFC().to(device=DEVICE)
+central_net = nn_architectures.NetFC().to(device=DEVICE)
 loss_fn = nn.NLLLoss()
-optimizer = optim.Adam(simple_net.parameters(), lr=FC_LEARNING_RATE)
+optimizer = optim.Adam(local_net.parameters(), lr=FC_LEARNING_RATE)
 test_set = enumerate(test_loader)
 
-def train_epoch_fed_local(model, loss_fn, optimizer):
+def train_epoch_local(model, loss_fn, optimizer):
     loss = -1
     model.train()
     for batch_idx, (train_x, train_y) in enumerate(train_loader):
@@ -68,16 +69,17 @@ def train_epoch_fed_local(model, loss_fn, optimizer):
 
     return (loss, model.parameters())
 
-def train_epoch_fed_avg(model, optimizer):
-    return
+def train_epoch_central_avg(model, optimizer):
+
+    return (loss, model.parameters())
 
 def save_model_global_var():
-    global simple_net
-    torch.save(simple_net, MODELPATH)
+    global local_net
+    torch.save(local_net, MODELPATH)
 
 def load_model_global_var():
-    global simple_net
-    simple_net = torch.load(MODELPATH)
+    global local_net
+    local_net = torch.load(MODELPATH)
 
 def evaluate(model):
     acc = -1
@@ -85,6 +87,8 @@ def evaluate(model):
     model.eval()
     with torch.no_grad():
         for test_x, test_y in test_loader:
+            test_x = test_x.to(DEVICE)
+            test_y = test_y.to(DEVICE)
             output = model(test_x)
             pred = output.argmax(dim=1, keepdim=True)
             correct += pred.eq(test_y.view_as(pred)).sum().item()
@@ -98,11 +102,11 @@ def init_weights(model):
         model.bias.data.fill_(0.01)
 
 for epoch in range(N_EPOCHS):
-    init_weights(simple_net)
-    (loss, model_parameters) = train_epoch_fed_local(simple_net, loss_fn, optimizer)
+    init_weights(local_net)
+    (loss, model_parameters) = train_epoch_fed_local(local_net, loss_fn, optimizer)
     # save_model_global_var()
     # load_model_global_var()
-    acc = evaluate(simple_net)
+    acc = evaluate(local_net)
     print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
 def print_shapes():
