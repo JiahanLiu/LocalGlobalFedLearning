@@ -25,7 +25,6 @@ BATCH_SIZE_TRAIN = 256
 BATCH_SIZE_TEST = 1
 N_EPOCHS = 30
 LOG_INTERVAL = 10
-
 FC_LEARNING_RATE = 0.001
 
 torch.manual_seed(random.random() * 100)
@@ -48,30 +47,34 @@ train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=BAT
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE_TEST, shuffle=False)
 
 local_net = nn_architectures.NetFC().to(device=DEVICE)
-central_net = nn_architectures.NetFC().to(device=DEVICE)
+global_net = nn_architectures.NetFC().to(device=DEVICE)
+
 loss_fn = nn.NLLLoss()
 optimizer = optim.Adam(local_net.parameters(), lr=FC_LEARNING_RATE)
 test_set = enumerate(test_loader)
 
-def train_epoch_local(model, loss_fn, optimizer):
-    loss = -1
-    model.train()
+def train_epoch_local(local_model, global_params, loss_fn, optimizer, first_pass):
+    local_model.train()
+    if first_pass == False:
+        for w_global, w_local in zip(global_params, local_model.parameters()):
+            w_local.data = w_global.data
     for batch_idx, (train_x, train_y) in enumerate(train_loader):
         train_x = train_x.to(DEVICE)
         train_y = train_y.to(DEVICE)
         optimizer.zero_grad()
-        outputs = model(train_x)
+        outputs = local_model(train_x)
         loss = loss_fn(outputs, train_y)
         loss.backward()
-        for f in model.parameters():
+        for f in local_model.parameters():
             f.grad.data = f.grad.data
         optimizer.step()
 
-    return (loss, model.parameters())
+    return (loss, local_model.parameters())
 
-def train_epoch_central_avg(model, optimizer):
-
-    return (loss, model.parameters())
+def aggregate_central(global_model, local_params):
+    for w_global, w_local in zip(global_model.parameters(), local_params):
+            w_global.data = w_local.data
+    return (loss, global_model.parameters())
 
 def save_model_global_var():
     global local_net
@@ -103,10 +106,14 @@ def init_weights(model):
 
 for epoch in range(N_EPOCHS):
     init_weights(local_net)
-    (loss, model_parameters) = train_epoch_fed_local(local_net, loss_fn, optimizer)
+    first_pass = False
+    if epoch == 0:
+        first_pass = True
+    (loss, local_params) = train_epoch_local(local_net, local_params,loss_fn, optimizer, first_pass)
+    (loss, global_params) = aggregate_central(global_net, local_params)
     # save_model_global_var()
     # load_model_global_var()
-    acc = evaluate(local_net)
+    acc = evaluate(global_net)
     print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
 def print_shapes():
