@@ -1,6 +1,7 @@
+import evaluate
+import util
 from model import nn_architectures, data_loader
 
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,7 +12,6 @@ import os
 import random
 
 print("Torch Version: " + torch.__version__)
-
 DEVICE = torch.device("cpu")
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
@@ -33,7 +33,6 @@ global_net = nn_architectures.NetFC().to(device=DEVICE)
 
 loss_fn = nn.NLLLoss()
 optimizer = optim.Adam(local_net.parameters(), lr=FC_LEARNING_RATE)
-test_set = enumerate(test_loader)
 
 def transfer_global_params_to_local(local_model, global_params):
     for w_global, w_local in zip(global_params, local_model.parameters()):
@@ -67,21 +66,6 @@ def load_model_global_var():
     global local_net
     local_net = torch.load(MODELPATH)
 
-def evaluate(model):
-    acc = -1
-    correct = 0
-    model.eval()
-    with torch.no_grad():
-        for test_x, test_y in test_loader:
-            test_x = test_x.to(DEVICE)
-            test_y = test_y.to(DEVICE)
-            output = model(test_x)
-            pred = output.argmax(dim=1, keepdim=True)
-            correct += pred.eq(test_y.view_as(pred)).sum().item()
-        acc = (100 * correct) / len(test_loader.dataset)
-
-    return acc
-
 def init_weights(model):
     if type(model) == nn.Linear:
         torch.nn.init.xavier_uniform(model.weight)
@@ -106,32 +90,14 @@ def fed_learning():
 
         # save_model_global_var()
         # load_model_global_var()
-        acc = evaluate(global_net)
+        acc = evaluate.evaluate(
+            model=global_net, 
+            test_loader=test_loader)
+
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc))
 
-# fed_learning()
+fed_learning()
 
-(train_loaders, test_loader) = data_loader.get_random_partitioned_loaders(N_partitions=3)
+# (train_loaders, test_loader) = data_loader.get_random_partitioned_loaders(N_partitions=3)
 
-print(len(train_loaders))
-
-def print_shapes():
-    examples = enumerate(test_loader)
-    batch_idx, (example_data, example_targets) = next(examples)
-    print(example_data.shape) # torch.Size([1000, 1, 28, 28])
-
-def plot_samples():
-    examples = enumerate(test_loader)
-    batch_idx, (example_data, example_targets) = next(examples)
-    print(example_data.shape)
-
-    fig = plt.figure()
-    for i in range(6):
-        plt.subplot(2,3,i+1)
-        plt.tight_layout()
-        plt.imshow(example_data[i][0], cmap='gray', interpolation='none')
-        plt.title("Ground Truth: {}".format(example_targets[i]))
-        plt.xticks([])
-        plt.yticks([])
-        plt.show()
-        
+# print(len(train_loaders))
