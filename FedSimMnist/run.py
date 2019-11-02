@@ -28,7 +28,7 @@ FC_LEARNING_RATE = 0.001
 
 torch.manual_seed(random.random() * 100)
 
-train_loader, test_loader = data_loader.get_loaders(BATCH_SIZE_TRAIN, BATCH_SIZE_TEST)
+train_loader, validation_loader, test_loader = data_loader.get_loaders(BATCH_SIZE_TRAIN, BATCH_SIZE_TEST)
 
 local_net = nn_architectures.NetFC().to(device=DEVICE)
 global_net = nn_architectures.NetFC().to(device=DEVICE)
@@ -94,13 +94,13 @@ def fed_learning():
     for epoch in range(N_EPOCHS):
 
         transfer_global_params_to_local(
-            local_model = local_net, 
-            global_params = global_net.parameters())
+            local_model=local_net, 
+            global_params=global_net.parameters())
 
         (local_loss, local_params) = train_epoch_local(
-            local_model = local_net,
+            local_model=local_net,
             loss_fn=loss_fn,
-            optimizer = optimizer)
+            optimizer=optimizer)
 
         global_params = aggregate_central(
             global_model=global_net, 
@@ -111,7 +111,11 @@ def fed_learning():
         acc = evaluate(global_net)
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc))
 
-fed_learning()
+# fed_learning()
+
+(train_loaders, test_loader) = data_loader.get_random_partitioned_loaders(N_partitions=3, BATCH_SIZE_TRAIN=BATCH_SIZE_TRAIN, BATCH_SIZE_TEST=BATCH_SIZE_TEST)
+
+print(len(train_loaders))
 
 def print_shapes():
     examples = enumerate(test_loader)
