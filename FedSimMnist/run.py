@@ -18,7 +18,6 @@ if torch.cuda.is_available():
     print("Using Cuda")
     
 DIRPATH = os.getcwd()
-DATAPATH = DIRPATH + '/data/'
 MODELPATH = DIRPATH + '/model/training_in_progress.pkl'
 
 BATCH_SIZE_TRAIN = 256
@@ -29,7 +28,7 @@ FC_LEARNING_RATE = 0.001
 
 torch.manual_seed(random.random() * 100)
 
-train_loader, test_loader = data_loader.get_loaders(DATAPATH, BATCH_SIZE_TRAIN, BATCH_SIZE_TEST)
+train_loader, test_loader = data_loader.get_loaders(BATCH_SIZE_TRAIN, BATCH_SIZE_TEST)
 
 local_net = nn_architectures.NetFC().to(device=DEVICE)
 global_net = nn_architectures.NetFC().to(device=DEVICE)
@@ -38,10 +37,12 @@ loss_fn = nn.NLLLoss()
 optimizer = optim.Adam(local_net.parameters(), lr=FC_LEARNING_RATE)
 test_set = enumerate(test_loader)
 
-def train_epoch_local(local_model, global_params, loss_fn, optimizer):
-    local_model.train()
+def transfer_global_params_to_local(local_model, global_params):
     for w_global, w_local in zip(global_params, local_model.parameters()):
         w_local.data = w_global.data
+
+def train_epoch_local(local_model, loss_fn, optimizer):
+    local_model.train()
     for batch_idx, (train_x, train_y) in enumerate(train_loader):
         train_x = train_x.to(DEVICE)
         train_y = train_y.to(DEVICE)
@@ -49,17 +50,16 @@ def train_epoch_local(local_model, global_params, loss_fn, optimizer):
         outputs = local_model(train_x)
         loss = loss_fn(outputs, train_y)
         loss.backward()
-        for f in local_model.parameters():
-            f.grad.data = f.grad.data
+        # for f in local_model.parameters():
+        #     f.grad.data = f.grad.data
         optimizer.step()
 
     return (loss, local_model.parameters())
 
-def aggregate_central(global_model, local_params, loss_fn):
+def aggregate_central(global_model, local_params):
     for w_global, w_local in zip(global_model.parameters(), local_params):
             w_global.data = w_local.data
-    loss = 0
-    return (loss, global_model.parameters())
+    return global_model.parameters()
 
 def save_model_global_var():
     global local_net
@@ -92,16 +92,24 @@ def init_weights(model):
 def fed_learning():
     init_weights(global_net)
     for epoch in range(N_EPOCHS):
-        (local_loss, local_params) = train_epoch_local(
+
+        transfer_global_params_to_local(
             local_model = local_net, 
-            global_params = global_net.parameters(), 
-            loss_fn = loss_fn, 
+            global_params = global_net.parameters())
+
+        (local_loss, local_params) = train_epoch_local(
+            local_model = local_net,
+            loss_fn=loss_fn,
             optimizer = optimizer)
-        (global_loss, global_params) = aggregate_central(global_net, local_params, loss_fn)
+
+        global_params = aggregate_central(
+            global_model=global_net, 
+            local_params=local_params)
+
         # save_model_global_var()
         # load_model_global_var()
         acc = evaluate(global_net)
-        print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(local_loss.item()))
+        print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc))
 
 fed_learning()
 
