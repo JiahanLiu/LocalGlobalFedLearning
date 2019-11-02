@@ -1,11 +1,11 @@
 from model import nn_architectures, data_loader
 
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-import matplotlib.pyplot as plt
 
 import os
 import random
@@ -20,15 +20,13 @@ if torch.cuda.is_available():
 DIRPATH = os.getcwd()
 MODELPATH = DIRPATH + '/model/training_in_progress.pkl'
 
-BATCH_SIZE_TRAIN = 256
-BATCH_SIZE_TEST = 1
 N_EPOCHS = 30
 LOG_INTERVAL = 10
 FC_LEARNING_RATE = 0.001
 
 torch.manual_seed(random.random() * 100)
 
-train_loader, validation_loader, test_loader = data_loader.get_loaders(BATCH_SIZE_TRAIN, BATCH_SIZE_TEST)
+train_loader, validation_loader, test_loader = data_loader.get_loaders()
 
 local_net = nn_architectures.NetFC().to(device=DEVICE)
 global_net = nn_architectures.NetFC().to(device=DEVICE)
@@ -113,7 +111,7 @@ def fed_learning():
 
 # fed_learning()
 
-(train_loaders, test_loader) = data_loader.get_random_partitioned_loaders(N_partitions=3, BATCH_SIZE_TRAIN=BATCH_SIZE_TRAIN, BATCH_SIZE_TEST=BATCH_SIZE_TEST)
+(train_loaders, test_loader) = data_loader.get_random_partitioned_loaders(N_partitions=3)
 
 print(len(train_loaders))
 

@@ -4,7 +4,9 @@ from torchvision import datasets, transforms
 import math
 import os
 
+BATCH_SIZE_TRAIN = 256
 VALIDATION_SIZE = 10000
+BATCH_SIZE_TEST = 1
 
 DIRPATH = os.getcwd()
 DATAPATH = DIRPATH + '/data/'
@@ -36,7 +38,7 @@ def get_datasets():
 
     return train_dataset, test_dataset
 
-def get_loaders(BATCH_SIZE_TRAIN, BATCH_SIZE_TEST):
+def get_loaders():
     (train_dataset, test_dataset) = get_datasets()
 
     validation_set = PartitionedDataset()
@@ -62,7 +64,7 @@ def get_loaders(BATCH_SIZE_TRAIN, BATCH_SIZE_TEST):
 
     return train_loader, validation_loader, test_loader
 
-def get_random_partitioned_loaders(N_partitions, BATCH_SIZE_TRAIN, BATCH_SIZE_TEST):
+def get_random_partitioned_loaders(N_partitions):
     (train_dataset, test_dataset) = get_datasets()
 
     paritioned_train_sets = [PartitionedDataset() for n in range(N_partitions)]
