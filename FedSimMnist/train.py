@@ -53,8 +53,8 @@ def aggregate_central(global_model, local_params):
                 w_global.data += w_local.data / N_partitions
     return global_model.parameters()
 
-def central_learning(network_architecture):
-    (train_loader, validation_loader, test_loader) = data_loader.get_loaders()
+def central_learning(network_architecture, loader):
+    (train_loader, validation_loader, test_loader) = loader()
 
     net = network_architecture.to(device=DEVICE)
     loss_fn = nn.NLLLoss()
@@ -69,11 +69,11 @@ def central_learning(network_architecture):
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
-def central_learning_split_set(N_partitions):
-    (train_loader_all, NOTUSED, NOTUSED) = data_loader.get_loaders()
-    (train_loaders, validation_loader, test_loader) = data_loader.get_random_partitioned_loaders(N_partitions)
+def central_learning_split_sets(network_architecture, unified_loader, partitioned_loader, N_partitions):
+    (train_loader_all, NOTUSED1, NOTUSED2) = unified_loader()
+    (train_loaders, validation_loader, test_loader) = partitioned_loader(N_partitions)
 
-    net = nn_architectures.NetFC().to(device=DEVICE)
+    net = network_architecture.to(device=DEVICE)
     loss_fn = nn.NLLLoss()
     optimizer = optim.Adam(net.parameters(), lr=FC_LEARNING_RATE)
 
@@ -89,7 +89,7 @@ def central_learning_split_set(N_partitions):
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
 
-def fed_learning_sim(N_partitions, loader_fun):
+def fed_learning_sim(N_partitions, loader):
     (train_loaders, validation_loader, test_loader) = loader_fun(N_partitions)
 
     local_nets = [nn_architectures.NetFC().to(device=DEVICE) for i in range(N_partitions)]
@@ -115,8 +115,9 @@ def fed_learning_sim(N_partitions, loader_fun):
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | L_Loss: " + str(local_losses[0].item()) + " | G_Loss: " + str(global_loss.item()))
 
 def main(): 
-    central_learning(network_architecture=nn_architectures.NetFC())
-    # fed_learning_sim(N_partitions=3, loader_fun=data_loader.get_random_partitioned_loaders)
+    # central_learning(network_architecture=nn_architectures.NetFC, loader=dataloader.get_loaders)
+    central_learning_split_sets(network_architecture==nn_architectures.NetFC, unified_loader=dataloader.get_loader, partitioned_loader=data_loader.get_random_partitioned_loaders, N_partitions=3)
+    # fed_learning_sim(N_partitions=3, loader=data_loader.get_random_partitioned_loaders)
 
 if __name__ == "__main__":
     main()
