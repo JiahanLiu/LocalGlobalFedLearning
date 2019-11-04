@@ -53,8 +53,9 @@ def aggregate_central(global_model, local_params):
                 w_global.data += w_local.data / N_partitions
     return global_model.parameters()
 
-def central_learning(network_architecture, loader):
-    (train_loader, validation_loader, test_loader) = loader()
+def central_learning(network_architecture, get_train_loader, get_test_loader):
+    (train_loader, validation_loader) = get_train_loader()
+    test_loader = get_test_loader(1)
 
     net = network_architecture().to(device=DEVICE)
     loss_fn = nn.NLLLoss()
@@ -69,9 +70,10 @@ def central_learning(network_architecture, loader):
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
-def central_learning_split_sets(network_architecture, unified_loader, partitioned_loader, N_partitions):
-    (train_loader_all, NOTUSED1, NOTUSED2) = unified_loader()
-    (train_loaders, validation_loader, test_loader) = partitioned_loader(N_partitions)
+def central_learning_split_sets(network_architecture, get_unified_loader, get_partitioned_loader, get_test_loader, N_partitions):
+    (train_loader_all, not_used) = get_unified_loader()
+    (train_loaders, validation_loader) = get_partitioned_loader(N_partitions)
+    test_loader = get_test_loader(N_partitions)
 
     net = network_architecture().to(device=DEVICE)
     loss_fn = nn.NLLLoss()
@@ -88,8 +90,9 @@ def central_learning_split_sets(network_architecture, unified_loader, partitione
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
-def fed_learning(network_architecture, loader, N_partitions):
-    (train_loaders, validation_loader, test_loader) = loader(N_partitions)
+def fed_learning(network_architecture, get_train_loader, get_test_loader, N_partitions):
+    (train_loaders, validation_loader) = get_train_loader(N_partitions)
+    test_loader = get_test_loader(N_partitions)
 
     local_nets = [network_architecture().to(device=DEVICE) for i in range(N_partitions)]
     global_net = network_architecture().to(device=DEVICE)
@@ -113,8 +116,9 @@ def fed_learning(network_architecture, loader, N_partitions):
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | L_Loss: " + str(local_losses[0].item()) + " | G_Loss: " + str(global_loss.item()))
 
-def local_learning(network_architecture, loader, N_partitions):
-    (train_loaders, validation_loader, test_loader) = loader(N_partitions)
+def local_learning(network_architecture, get_train_loader, get_test_loader, N_partitions):
+    (train_loaders, validation_loader) = get_train_loader(N_partitions)
+    test_loader = get_test_loader(N_partitions)
 
     local_nets = [network_architecture().to(device=DEVICE) for i in range(N_partitions)]
     loss_fn = nn.NLLLoss()
@@ -122,9 +126,6 @@ def local_learning(network_architecture, loader, N_partitions):
 
     for i in range(N_partitions):
         init_weights(local_nets[i])
-
-    print("Len")
-    print(len(test_loader[0]))
 
     for epoch in range(N_EPOCHS):
         local_losses = []
@@ -145,15 +146,22 @@ def local_learning(network_architecture, loader, N_partitions):
         print("Epoch: " + str(epoch) + " | Avg_L_Accuracy: " + str(avg_local_accuracy) + " | Avg_L_Loss: " + str(avg_local_loss.item()))
 
 def main(): 
-    # central_learning(network_architecture=nn_architectures.NetFC, loader=data_loader.get_unified_loaders)
-    # central_learning_split_sets(network_architecture=nn_architectures.NetFC, unified_loader=data_loader.get_unified_loaders, partitioned_loader=data_loader.get_random_partitioned_loaders, N_partitions=3)
+    central_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unified_train_loader, 
+        get_test_loader=data_loader.get_unified_test_loader)
+    # central_learning_split_sets(network_architecture=nn_architectures.NetFC, get_unified_loader=data_loader.get_unified_train_loader, 
+    #     get_partitioned_loader=data_loader.get_random_partitioned_train_loaders, get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     
-    # fed_learning(network_architecture=nn_architectures.NetFC, loader=data_loader.get_random_partitioned_loaders, N_partitions=3)
-    # fed_learning(network_architecture=nn_architectures.NetFC, loader=data_loader.get_unbalanced_partitioned_loaders_unified_test, N_partitions=3)
+    # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
+    #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
+    # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
+    #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
 
-    # local_learning(network_architecture=nn_architectures.NetFC, loader=data_loader.get_random_partitioned_loaders, N_partitions=3)
-    # local_learning(network_architecture=nn_architectures.NetFC, loader=data_loader.get_unbalanced_partitioned_loaders_unified_test, N_partitions=3)
-    local_learning(network_architecture=nn_architectures.NetFC, loader=data_loader.get_unbalanced_partitioned_loaders_local_tests, N_partitions=3)
+    # local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
+    #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
+    # local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
+    #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
+    # local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
+    #     get_test_loader=data_loader.get_unbalanced_partitioned_test_loaders, N_partitions=3)
 
 if __name__ == "__main__":
     main()
