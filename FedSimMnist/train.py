@@ -146,13 +146,13 @@ def local_learning(network_architecture, get_train_loader, get_test_loader, N_pa
         print("Epoch: " + str(epoch) + " | Avg_L_Accuracy: " + str(avg_local_accuracy) + " | Avg_L_Loss: " + str(avg_local_loss.item()))
 
 def main(): 
-    central_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unified_train_loader, 
-        get_test_loader=data_loader.get_unified_test_loader)
+    # central_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unified_train_loader, 
+    #     get_test_loader=data_loader.get_unified_test_loader)
     # central_learning_split_sets(network_architecture=nn_architectures.NetFC, get_unified_loader=data_loader.get_unified_train_loader, 
     #     get_partitioned_loader=data_loader.get_random_partitioned_train_loaders, get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     
-    # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
-    #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
+    fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
+        get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
     #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
 

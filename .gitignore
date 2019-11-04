@@ -6,3 +6,4 @@
 **/catboost_info
 *.tmp
 */__pycache__/
+*.pyc
