@@ -1,4 +1,5 @@
 import evaluate
+from model import nn_architectures
 
 import torch
 import torch.nn as nn
@@ -11,23 +12,32 @@ if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
     print("Federated Using Cuda")
 
-class Federated_Local:
-    def __init__(self, network_architecture, get_train_loader, N_partitions, node_id):
+class Local_Model:
+    def __init__(self, network_architecture, get_train_loader, get_test_loader, N_partitions, node_id):
         config = configparser.RawConfigParser()
         config.read('config.cfg')
         FC_LEARNING_RATE = float(config['DEFAULT']['FC_LEARNING_RATE'])
 
         train_loaders, validation_loader = get_train_loader(N_partitions)
-        self.train_loader = train_loaders[node_id] 
+        test_loaders = get_test_loader(N_partitions)
+        
+        self.test_loader = test_loaders
+        if(len(test_loaders) > 1):
+            self.test_loader = test_loaders[node_id]
+        self.train_loader = train_loaders
+        if(N_partitions > 1):
+            self.train_loader = train_loaders[node_id] 
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=FC_LEARNING_RATE)
 
-    def __transfer_param_to_model(self, param):
+        nn_architectures.xavier_init(self.model)
+
+    def transfer_param_to_model(self, param):
         for w_model, w_param in zip(self.model.parameters(), param):
             w_model.data = w_param.data
 
-    def __train_epoch(self):
+    def train(self):
         self.model.train()
         for batch_idx, (train_x, train_y) in enumerate(self.train_loader):
             train_x = train_x.to(DEVICE)
@@ -40,24 +50,21 @@ class Federated_Local:
 
         return (loss, self.model.parameters())
 
-    def train(self, global_model):
-        self.__transfer_param_to_model(param=global_model.parameters())
-        (loss, local_param) = self.__train_epoch()
+    def get_accuracy(self):
+        acc = evaluate.accuracy(self.model, self.test_loader)
+        return acc
 
-        return (loss, local_param)
-
-class Federated_Global:
+    def get_loss(self):
+        loss = evaluate.loss(self.model, self.train_loader, self.loss_fn)
+        return loss
+    
+class Aggregated_Model:
     def __init__(self, network_architecture, get_test_loader, N_partitions):
         self.test_loader = get_test_loader(N_partitions)
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
 
-        self.__init_weights(self.model)
-
-    def __init_weights(self, model):
-        if type(model) == nn.Linear:
-            torch.nn.init.xavier_uniform(model.weight)
-            model.bias.data.fill_(0.01)
+        nn_architectures.xavier_init(self.model)
 
     def aggregate_central(self, local_params):
         N_partitions = len(local_params)
@@ -70,17 +77,15 @@ class Federated_Global:
     
         return self.model.parameters()
 
-    def get_accuracy():
+    def get_accuracy(self):
         acc = evaluate.accuracy(model=self.model, data_loader=self.test_loader)
         return acc
 
-    def get_model(self):
-        return self.model
+    def get_params(self):
+        return self.model.parameters()
 
     def get_test_loader(self):
         return self.test_loader
-
-
 
 
         

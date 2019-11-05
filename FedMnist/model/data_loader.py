@@ -70,7 +70,7 @@ def fill_unbalanced_set(train_dataset, paritioned_train_sets, total_size, N_part
 
     return index
 
-def get_unified_train_loader():
+def get_unified_train_loader(polymorphism_filler):
     train_dataset = get_train_datasets()
 
     train_set = PartitionedDataset()
@@ -90,7 +90,7 @@ def get_unified_train_loader():
 
     return train_loader, validation_loader
 
-def get_unified_test_loader(N_partitions):
+def get_unified_test_loader(polymorphism_filler):
     test_dataset = get_test_datasets()
     total_size = len(test_dataset)
 
@@ -99,13 +99,13 @@ def get_unified_test_loader(N_partitions):
     return test_loader
 
 def get_random_partitioned_train_loaders(N_partitions):
-    random_partitioned_train_loaders = get_semibalanced_partitioned_train_loader_closure(100)
+    random_partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(100)
     (train_loaders, validation_loader) = random_partitioned_train_loaders(N_partitions)
 
     return (train_loaders, validation_loader)
 
 def get_unbalanced_partitioned_train_loaders(N_partitions):
-    random_partitioned_train_loaders = get_semibalanced_partitioned_train_loader_closure(0)
+    random_partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(0)
     (train_loaders, validation_loader) = random_partitioned_train_loaders(N_partitions)
 
     return (train_loaders, validation_loader)
@@ -125,9 +125,9 @@ def get_unbalanced_partitioned_test_loaders(N_partitions):
 
     return test_loaders
 
-def get_semibalanced_partitioned_train_loader_closure(percentage_balanced):
+def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced):
 
-    def get_semibalanced_partitioned_train_loader(N_partitions):
+    def get_semibalanced_partitioned_train_loaders(N_partitions):
         train_dataset = get_train_datasets()
 
         validation_set = PartitionedDataset()
@@ -149,4 +149,4 @@ def get_semibalanced_partitioned_train_loader_closure(percentage_balanced):
 
         return (train_loaders, validation_loader)
 
-    return get_semibalanced_partitioned_train_loader
+    return get_semibalanced_partitioned_train_loaders

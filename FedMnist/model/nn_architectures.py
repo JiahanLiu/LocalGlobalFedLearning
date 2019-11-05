@@ -39,3 +39,8 @@ class NetCNN(nn.Module):
         x = F.log_softmax(x, dim=1)
 
         return x
+
+def xavier_init(model):
+    if type(model) == nn.Linear:
+        torch.nn.init.xavier_uniform(model.weight)
+        model.bias.data.fill_(0.01)
