@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 import configparser
+import random
 
 DEVICE = torch.device("cpu")
 if torch.cuda.is_available():

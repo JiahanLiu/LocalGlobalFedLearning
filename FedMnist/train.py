@@ -76,7 +76,7 @@ def main():
     config.read('config.cfg')
     N_EPOCHS = int(config['DEFAULT']['N_EPOCHS'])
 
-    get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loaders_closure(50)
+    # get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loaders_closure(50)
     
     # central_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unified_train_loader, 
     #     get_test_loader=data_loader.get_unified_test_loader)
