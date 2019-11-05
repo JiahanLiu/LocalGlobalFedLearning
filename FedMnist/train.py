@@ -1,4 +1,5 @@
 import evaluate
+import federated
 import util
 from model import nn_architectures, data_loader
 
@@ -8,6 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
+import configparser
 import random
     
 print("Torch Version: " + torch.__version__)
@@ -18,9 +20,8 @@ if torch.cuda.is_available():
 
 torch.manual_seed(random.random() * 100)
 
-N_EPOCHS = 30
-LOG_INTERVAL = 10
-FC_LEARNING_RATE = 0.001
+N_EPOCHS = 0
+FC_LEARNING_RATE = 0
 
 def init_weights(model):
     if type(model) == nn.Linear:
@@ -90,6 +91,57 @@ def central_learning_split_sets(network_architecture, get_unified_loader, get_pa
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
 
+def fed_learning_local_phase(network_architecture, get_train_loader, N_partitions):
+    (train_loaders, validation_loader) = get_train_loader(N_partitions)
+
+    local_nets = [network_architecture().to(device=DEVICE) for i in range(N_partitions)]
+    loss_fn = nn.NLLLoss()
+    optimizers = [optim.Adam(local_nets[i].parameters(), lr=FC_LEARNING_RATE) for i in range(N_partitions)]
+
+    for i in range(N_partitions): 
+        transfer_param_to_model(model=local_nets[i], param=global_net.parameters())
+        (loss_i, local_param_i) = train_epoch(model=local_nets[i], train_loader=train_loaders[i], loss_fn=loss_fn, optimizer=optimizers[i])
+        local_losses.append(loss_i)
+        local_params.append(local_param_i)
+
+    return 
+            
+def fed_learning_global_phase(network_architecture, get_test_loader, N_partitions):
+    test_loader = get_test_loader(N_partitions)
+
+    global_net = network_architecture().to(device=DEVICE)
+    init_weights(global_net)
+
+    global_param = aggregate_central(global_model=global_net, local_params=local_params)
+
+    acc = evaluate.accuracy(model=global_net, data_loader=test_loader)
+    global_loss = evaluate.loss(model=local_nets[0], data_loader=train_loaders[0], loss_fn=loss_fn)
+
+    print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | G_Loss: " + str(global_loss.item()))
+
+def fed_learning2(network_architecture, get_train_loader, get_test_loader, N_partitions):
+    test_loader = get_test_loader(N_partitions)
+
+    local_nets = [federated.Federated_Local(network_architecture, get_train_loader, N_partitions, i) for i in range(N_partitions)]
+    global_net = network_architecture().to(device=DEVICE)
+    loss_fn = nn.NLLLoss()
+
+    init_weights(global_net)
+    for epoch in range(N_EPOCHS):
+        local_losses = []
+        local_params = []
+        for i in range(N_partitions): 
+            (loss_i, local_param_i) = local_nets[i].train(global_net)
+            local_losses.append(loss_i)
+            local_params.append(local_param_i)
+
+        global_param = aggregate_central(global_model=global_net, local_params=local_params)
+
+        acc = evaluate.accuracy(model=global_net, data_loader=test_loader)
+        # global_loss = evaluate.loss(model=local_nets[0], data_loader=train_loaders[0], loss_fn=loss_fn)
+
+        print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc))
+
 def fed_learning(network_architecture, get_train_loader, get_test_loader, N_partitions):
     (train_loaders, validation_loader) = get_train_loader(N_partitions)
     test_loader = get_test_loader(N_partitions)
@@ -114,7 +166,7 @@ def fed_learning(network_architecture, get_train_loader, get_test_loader, N_part
         acc = evaluate.accuracy(model=global_net, data_loader=test_loader)
         global_loss = evaluate.loss(model=local_nets[0], data_loader=train_loaders[0], loss_fn=loss_fn)
 
-        print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | L_Loss: " + str(local_losses[0].item()) + " | G_Loss: " + str(global_loss.item()))
+        print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | G_Loss: " + str(global_loss.item()))
 
 def local_learning(network_architecture, get_train_loader, get_test_loader, N_partitions):
     (train_loaders, validation_loader) = get_train_loader(N_partitions)
@@ -146,6 +198,14 @@ def local_learning(network_architecture, get_train_loader, get_test_loader, N_pa
         print("Epoch: " + str(epoch) + " | Avg_L_Accuracy: " + str(avg_local_accuracy) + " | Avg_L_Loss: " + str(avg_local_loss.item()))
 
 def main(): 
+    global N_EPOCHS
+    global FC_LEARNING_RATE
+    
+    config = configparser.RawConfigParser()
+    config.read('config.cfg')
+    N_EPOCHS = int(config['DEFAULT']['N_EPOCHS'])
+    FC_LEARNING_RATE = float(config['DEFAULT']['FC_LEARNING_RATE'])
+
     # get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loader_closure(50)
     
     # central_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unified_train_loader, 
@@ -153,7 +213,7 @@ def main():
     # central_learning_split_sets(network_architecture=nn_architectures.NetFC, get_unified_loader=data_loader.get_unified_train_loader, 
     #     get_partitioned_loader=data_loader.get_random_partitioned_train_loaders, get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     
-    fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
+    fed_learning2(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
         get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
     #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
