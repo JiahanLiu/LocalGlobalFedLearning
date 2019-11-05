@@ -90,21 +90,6 @@ def central_learning_split_sets(network_architecture, get_unified_loader, get_pa
         loss = evaluate.loss(model=net, data_loader=train_loader_all, loss_fn=loss_fn)
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
-
-def fed_learning_local_phase(network_architecture, get_train_loader, N_partitions):
-    (train_loaders, validation_loader) = get_train_loader(N_partitions)
-
-    local_nets = [network_architecture().to(device=DEVICE) for i in range(N_partitions)]
-    loss_fn = nn.NLLLoss()
-    optimizers = [optim.Adam(local_nets[i].parameters(), lr=FC_LEARNING_RATE) for i in range(N_partitions)]
-
-    for i in range(N_partitions): 
-        transfer_param_to_model(model=local_nets[i], param=global_net.parameters())
-        (loss_i, local_param_i) = train_epoch(model=local_nets[i], train_loader=train_loaders[i], loss_fn=loss_fn, optimizer=optimizers[i])
-        local_losses.append(loss_i)
-        local_params.append(local_param_i)
-
-    return 
             
 def fed_learning_global_phase(network_architecture, get_test_loader, N_partitions):
     test_loader = get_test_loader(N_partitions)
@@ -120,24 +105,20 @@ def fed_learning_global_phase(network_architecture, get_test_loader, N_partition
     print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | G_Loss: " + str(global_loss.item()))
 
 def fed_learning2(network_architecture, get_train_loader, get_test_loader, N_partitions):
-    test_loader = get_test_loader(N_partitions)
-
     local_nets = [federated.Federated_Local(network_architecture, get_train_loader, N_partitions, i) for i in range(N_partitions)]
-    global_net = network_architecture().to(device=DEVICE)
-    loss_fn = nn.NLLLoss()
+    global_net = federated.Federated_Global(network_architecture, get_test_loader, N_partitions)
 
-    init_weights(global_net)
     for epoch in range(N_EPOCHS):
         local_losses = []
         local_params = []
         for i in range(N_partitions): 
-            (loss_i, local_param_i) = local_nets[i].train(global_net)
+            (loss_i, local_param_i) = local_nets[i].train(global_net.get_model())
             local_losses.append(loss_i)
             local_params.append(local_param_i)
 
-        global_param = aggregate_central(global_model=global_net, local_params=local_params)
+        global_param = global_net.aggregate_central(local_params)
 
-        acc = evaluate.accuracy(model=global_net, data_loader=test_loader)
+        acc = evaluate.accuracy(model=global_net.get_model(), data_loader=global_net.get_test_loader())
         # global_loss = evaluate.loss(model=local_nets[0], data_loader=train_loaders[0], loss_fn=loss_fn)
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc))
