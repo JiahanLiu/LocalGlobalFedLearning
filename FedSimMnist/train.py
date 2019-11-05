@@ -153,8 +153,8 @@ def main():
     # central_learning_split_sets(network_architecture=nn_architectures.NetFC, get_unified_loader=data_loader.get_unified_train_loader, 
     #     get_partitioned_loader=data_loader.get_random_partitioned_train_loaders, get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     
-    # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
-    #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
+    fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_random_partitioned_train_loaders, 
+        get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
     #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     # fed_learning(network_architecture=nn_architectures.NetFC, get_train_loader=get_semibalanced_partitioned_train_loader_fifty_percent, 
@@ -164,8 +164,8 @@ def main():
     #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
     # local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
     #     get_test_loader=data_loader.get_unified_test_loader, N_partitions=3)
-    local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
-        get_test_loader=data_loader.get_unbalanced_partitioned_test_loaders, N_partitions=3)
+    # local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
+    #     get_test_loader=data_loader.get_unbalanced_partitioned_test_loaders, N_partitions=3)
 
 
 
