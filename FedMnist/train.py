@@ -167,8 +167,6 @@ def main():
     # local_learning(network_architecture=nn_architectures.NetFC, get_train_loader=data_loader.get_unbalanced_partitioned_train_loaders, 
     #     get_test_loader=data_loader.get_unbalanced_partitioned_test_loaders, N_partitions=3)
 
-
-
 if __name__ == "__main__":
     main()
 
