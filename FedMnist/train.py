@@ -17,7 +17,6 @@ DEVICE = torch.device("cpu")
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
     print("Using Cuda")
-
 torch.manual_seed(random.random() * 100)
 
 N_EPOCHS = 0
@@ -31,9 +30,6 @@ def central_learning(network_architecture, get_train_loader, get_test_loader):
         loss = net.get_loss()
 
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
-            
-def fed_learning_global_phase(network_architecture, get_test_loader, N_partitions):
-    return 
 
 def fed_learning(network_architecture, get_train_loader, get_test_loader, N_partitions):
     local_nets = [federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions, i) for i in range(N_partitions)]

@@ -11,6 +11,7 @@ DEVICE = torch.device("cpu")
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
     print("Federated Using Cuda")
+torch.manual_seed(random.random() * 100)
 
 class Local_Model:
     def __init__(self, network_architecture, get_train_loader, get_test_loader, N_partitions, node_id):
