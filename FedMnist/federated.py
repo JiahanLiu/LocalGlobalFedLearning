@@ -59,6 +59,9 @@ class Local_Model:
     def get_loss(self):
         loss = evaluate.loss(self.model, self.train_loader, self.loss_fn)
         return loss
+
+    def get_model(self):
+        return self.model
     
 class Aggregated_Model:
     def __init__(self, network_architecture, get_test_loader, N_partitions):
