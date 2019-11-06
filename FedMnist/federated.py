@@ -27,7 +27,7 @@ class Local_Model:
         if(len(test_loaders) > 1):
             self.test_loader = test_loaders[node_id]
         self.train_loader = train_loaders
-        if(N_partitions > 1):
+        if(N_partitions != 0):
             self.train_loader = train_loaders[node_id] 
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
