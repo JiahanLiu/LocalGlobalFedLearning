@@ -35,10 +35,10 @@ def load_model_from_file(model, file_path):
     model.load_state_dict(checkpoint)
 
 def federated_local(network_architecture, get_train_loader, get_test_loader, n_epochs):
-    upload_file_name = "node0_local_param.txt"
+    upload_file_name = "node0_local_param.pt"
     pwd_path = os.path.abspath(os.path.dirname(__file__))
     local_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, upload_file_name)
-    download_file_name = "global_param.txt"
+    download_file_name = "global_param.pt"
     global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, download_file_name)
 
     net = federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions=1, node_id=0)
@@ -64,17 +64,6 @@ def main():
     UPLOAD_URL = SERVER_URL_BASE + config['CLIENT']['UPLOAD_ROUTE']
     DOWNLOAD_URL = SERVER_URL_BASE + config['CLIENT']['DOWNLOAD_ROUTE']
     N_EPOCHS = int(config['DEFAULT']['N_EPOCHS'])
-
-    # pwd_path = os.path.abspath(os.path.dirname(__file__))
-    # upload_file_name = "node0_local_param.txt"
-    # local_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, upload_file_name)
-
-    # upload_local_param(UPLOAD_URL, local_param_file_path, upload_file_name)
-    
-    # download_file_name = "global_param.txt"
-    # global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, download_file_name)
-
-    # download_global_param(DOWNLOAD_URL, global_param_file_path)
 
     federated_local(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS)
 
