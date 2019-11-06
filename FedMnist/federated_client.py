@@ -20,8 +20,9 @@ def upload_local_param(upload_url, file_path, file_name):
         print(r)
         print("Local Params Uploaded")
 
-def download_global_param(download_url, file_path):
-    r = requests.get(download_url, allow_redirects=True)
+def download_global_param(download_url, file_path, file_name):
+    payload = {'filename': file_name}
+    r = requests.get(download_url, params=payload, allow_redirects=True)
     open(file_path, 'wb').write(r.content)
     print("File Downloaded")
 
@@ -35,19 +36,19 @@ def load_model_from_file(model, file_path):
     model.load_state_dict(checkpoint)
 
 def federated_local(network_architecture, get_train_loader, get_test_loader, n_epochs):
-    upload_file_name = "node0_local_param.pt"
+    local_param_file_name = "node0_local_param.pt"
     pwd_path = os.path.abspath(os.path.dirname(__file__))
-    local_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, upload_file_name)
-    download_file_name = "global_param.pt"
-    global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, download_file_name)
+    local_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, local_param_file_name)
+    global_param_file_name = "global_param.pt"
+    global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, global_param_file_name)
 
     net = federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions=1, node_id=0)
 
     for epoch in range(n_epochs):
         (loss, local_param) = net.train()
         save_model_to_file(net.get_model(), local_param_file_path)
-        upload_local_param(UPLOAD_URL, local_param_file_path, upload_file_name)
-        download_global_param(DOWNLOAD_URL, global_param_file_path)
+        upload_local_param(UPLOAD_URL, local_param_file_path, local_param_file_name)
+        download_global_param(DOWNLOAD_URL, global_param_file_path, global_param_file_name)
         load_model_from_file(net.get_model(), global_param_file_path)
         updated_param = net.get_model().parameters()
         net.transfer_param_to_model(updated_param)
