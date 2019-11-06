@@ -1,29 +1,43 @@
 import requests
+
+import configparser
 import os.path
 
-URL_BASE = "http://167.71.247.3:3000/"
-UPLOAD_URL = URL_BASE + "local_upload"
-DOWNLOAD_URL = URL_BASE + "get_global_param"
+SERVER_URL_BASE = None
+UPLOAD_URL = None
+DOWNLOAD_URL = None
 
-FILE_DIR = "param_files/"
-UPLOAD_NAME = "upload.txt"
-DOWNLOAD_NAME = "download.txt"
+PARAM_FILE_DIR = "param_files/"
 
-pwd_path = os.path.abspath(os.path.dirname(__file__))
-
-def upload_file_to_server(file_dir, file_name):
-    with open(file_dir+file_name, 'rb') as file:
-        files = {'file':('node1_param.txt', file)}
-        r = requests.post(UPLOAD_URL, files=files)
+def upload_local_param(upload_url, file_path, file_name):
+    with open(file_path, 'rb') as file:
+        files = {'file':(file_name, file)}
+        r = requests.post(upload_url, files=files)
         print(r)
-        print("File Uploaded")
+        print("Local Params Uploaded")
 
-absolute_path = os.path.join(pwd_path, FILE_DIR)
-upload_file_to_server(absolute_path, UPLOAD_NAME)
-
-def get_file_from_server(file_dir, file_name):
-    r = requests.get(DOWNLOAD_URL, allow_redirects=True)
-    open(file_dir+file_name, 'wb').write(r.content)
+def download_global_param(download_url, file_path):
+    r = requests.get(download_url, allow_redirects=True)
+    open(file_path, 'wb').write(r.content)
     print("File Downloaded")
 
-# get_file_from_server(absolute_path, DOWNLOAD_NAME)
+def main():
+    config = configparser.RawConfigParser()
+    config.read('../config.cfg')
+    SERVER_URL_BASE = config['CLIENT']['SERVER_URL_BASE']
+    UPLOAD_URL = SERVER_URL_BASE + config['CLIENT']['UPLOAD_ROUTE']
+    DOWNLOAD_URL = SERVER_URL_BASE + config['CLIENT']['DOWNLOAD_ROUTE']
+
+    pwd_path = os.path.abspath(os.path.dirname(__file__))
+    upload_file_name = "node0_local_param.txt"
+    local_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, upload_file_name)
+
+    upload_local_param(UPLOAD_URL, local_param_file_path, upload_file_name)
+    
+    download_file_name = "global_param.txt"
+    global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, download_file_name)
+
+    download_global_param(DOWNLOAD_URL, global_param_file_path)
+
+if __name__ == "__main__":
+    main()
