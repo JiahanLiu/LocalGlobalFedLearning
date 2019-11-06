@@ -16,7 +16,7 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
     fs.rename(req.file.path, file_destination, function(err) {
         if (err) {
             console.log(err);
-            res.send(500);
+            res.sendStatus(500);
         } else {
             res.json({
                 message: 'File uploaded successfully',
@@ -26,13 +26,13 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
     });
 });
 
-var GLOBAL_PARAMS_FILE = 'node0_local_param.txt'
-var GLOBAL_PARAMS_PATH = __dirname + FILES_DIR + GLOBAL_PARAMS_FILE;
+var base_path = __dirname + FILES_DIR;
 app.get('/get_global_param', function(req, res) {
-    res.download(GLOBAL_PARAMS_PATH, GLOBAL_PARAMS_FILE, function (err) {
+    filename = req.query.filename
+    res.download(base_path+filename, filename, function (err) {
         if (err) {
             console.log(err);
-            res.send(500);
+            res.sendStatus(500);
         } else {
             console.log("Successful Download")
         }
