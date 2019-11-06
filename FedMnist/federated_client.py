@@ -6,6 +6,7 @@ import torch
 import configparser
 import os.path
 import requests
+import sys
 
 SERVER_URL_BASE = None
 UPLOAD_URL = None
@@ -35,8 +36,8 @@ def load_model_from_file(model, file_path):
     checkpoint = torch.load(file_path)
     model.load_state_dict(checkpoint)
 
-def federated_local(network_architecture, get_train_loader, get_test_loader, n_epochs):
-    local_param_file_name = "node0_local_param.pt"
+def federated_local(network_architecture, get_train_loader, get_test_loader, n_epochs, node_n):
+    local_param_file_name = "node" + str(node_n) + "_local_param.pt"
     pwd_path = os.path.abspath(os.path.dirname(__file__))
     local_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, local_param_file_name)
     global_param_file_name = "global_param.pt"
@@ -56,6 +57,10 @@ def federated_local(network_architecture, get_train_loader, get_test_loader, n_e
         print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc))
 
 def main():
+    if(len(sys.argv) < 2):
+        print("Need arg for node_n - the node number.")
+    node_n = sys.argv[1]
+
     global SERVER_URL_BASE
     global UPLOAD_URL
     global DOWNLOAD_URL
@@ -66,7 +71,7 @@ def main():
     DOWNLOAD_URL = SERVER_URL_BASE + config['CLIENT']['DOWNLOAD_ROUTE']
     N_EPOCHS = int(config['DEFAULT']['N_EPOCHS'])
 
-    federated_local(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS)
+    federated_local(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, node_n)
 
 if __name__ == "__main__":
     main()
