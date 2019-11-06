@@ -74,13 +74,13 @@ def main():
 
     # get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loaders_closure(50)
     
-    central_learning(nn_architectures.NetFC, data_loader.get_unified_train_loader, data_loader.get_unified_test_loader, N_EPOCHS)
+    # central_learning(nn_architectures.NetFC, data_loader.get_unified_train_loader, data_loader.get_unified_test_loader, N_EPOCHS)
     
     # fed_learning(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions=3)
     # fed_learning(nn_architectures.NetFC, data_loader.get_unbalanced_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions=3)
     # fed_learning(nn_architectures.NetFC, get_semibalanced_partitioned_train_loader_fifty_percent, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions=3)
 
-    # local_learning(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions=3)
+    local_learning(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions=3)
     # local_learning(nn_architectures.NetFC, data_loader.get_unbalanced_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions=3)
     # local_learning(nn_architectures.NetFC, data_loader.get_unbalanced_partitioned_train_loaders, data_loader.get_unbalanced_partitioned_test_loaders, N_EPOCHS, N_partitions=3)
 
