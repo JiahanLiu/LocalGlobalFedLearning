@@ -9,6 +9,7 @@ import json
 import os.path
 import requests
 import sys
+import time
 
 DEVICE = torch.device("cpu")
 if torch.cuda.is_available():
@@ -43,6 +44,9 @@ def wait_fed_avg_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_FED_AVG_DONE_URL)
         r_json = r.json()
+        print("Waiting...")
+        time.sleep(1)
+
     return
     
 def wait_global_sync_done():
@@ -51,6 +55,8 @@ def wait_global_sync_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_GLOBAL_SYNC_DONE_URL)
         r_json = r.json()
+        print("Waiting...")
+        time.sleep(1)
     return
 
 def federated_local(network_architecture, get_train_loader, get_test_loader, n_epochs, node_n):
