@@ -91,6 +91,4 @@ class Aggregated_Model:
 
     def get_test_loader(self):
         return self.test_loader
-
-
         
