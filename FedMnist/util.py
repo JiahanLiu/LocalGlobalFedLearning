@@ -1,5 +1,18 @@
+# from model import nn_architectures, data_loader
+
+import torch
 import matplotlib.pyplot as plt
 
+import os
+
+def save_model_to_file(model, file_path):
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+    torch.save(model.state_dict(), file_path)
+
+def load_model_from_file(model, file_path):
+    checkpoint = torch.load(file_path)
+    model.load_state_dict(checkpoint)
 
 def print_shapes(test_loader):
     examples = enumerate(test_loader)
