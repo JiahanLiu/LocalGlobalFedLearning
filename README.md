@@ -19,7 +19,7 @@ PCA Results We also apply T-distributed Stochastic Neighbor Embedding to visuali
 Catboost Results
 
 <p align="center">
-  <img src="https://github.com/JiahanLiu/LocalGlobalFedLearning/HumanActivityRecognition/blob/master/eda/catboost_results/Catboost_Results.png">
+  <img src="https://github.com/JiahanLiu/LocalGlobalFedLearning/blob/master/HumanActivityRecognition/eda/catboost_results/Catboost_Results.png">
 </p>
 
 
