@@ -14,10 +14,11 @@ DOWNLOAD_URL = None
 
 PARAM_FILE_DIR = "client/param_files/"
 
-def upload_local_param(upload_url, file_path, file_name):
+def upload_local_param(upload_url, file_path, file_name, node_n):
     with open(file_path, 'rb') as file:
         files = {'file':(file_name, file)}
-        r = requests.post(upload_url, files=files)
+        payload = {'node_n' : node_n}
+        r = requests.post(upload_url, files=files, params=payload)
         print(r)
         print("Local Params Uploaded")
 
@@ -48,7 +49,7 @@ def federated_local(network_architecture, get_train_loader, get_test_loader, n_e
     for epoch in range(n_epochs):
         (loss, local_param) = net.train()
         save_model_to_file(net.get_model(), local_param_file_path)
-        upload_local_param(UPLOAD_URL, local_param_file_path, local_param_file_name)
+        upload_local_param(UPLOAD_URL, local_param_file_path, local_param_file_name, node_n)
         download_global_param(DOWNLOAD_URL, global_param_file_path, global_param_file_name)
         load_model_from_file(net.get_model(), global_param_file_path)
         updated_param = net.get_model().parameters()
@@ -58,7 +59,7 @@ def federated_local(network_architecture, get_train_loader, get_test_loader, n_e
 
 def main():
     if(len(sys.argv) < 2):
-        print("Need arg for node_n - the node number.")
+        print("Error: Need arg[1] for node_n - the node number.")
     node_n = sys.argv[1]
 
     global SERVER_URL_BASE
