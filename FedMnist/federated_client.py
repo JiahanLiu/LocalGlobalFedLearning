@@ -57,8 +57,6 @@ def wait_fed_avg_done():
         r_json = r.json()
         wait_state = wait_print(wait_state)
         time.sleep(1)
-
-    return
     
 def wait_global_sync_done():
     r = requests.get(QUERY_GLOBAL_SYNC_DONE_URL)
@@ -68,7 +66,6 @@ def wait_global_sync_done():
         r_json = r.json()
         wait_state = wait_print(wait_state)
         time.sleep(1)
-    return
 
 def federated_local(network_architecture, get_train_loader, get_test_loader, n_epochs, node_n):
     local_param_file_name = "node" + str(node_n) + "_local_param.pt"
