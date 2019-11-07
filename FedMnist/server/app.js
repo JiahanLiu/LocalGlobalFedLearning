@@ -22,9 +22,9 @@ app.get('/', (req, res) => res.send('Federated Learning - Server'))
 app.post('/upload_local_param', upload.single('file'), function(req, res) {
     var file_destination = __dirname + '/param_files/' + req.file.originalname;
     var node_n = req.query.node_n;
-    // one_hot_state = one_hot_state | (1<<node_n)
-    one_hot_state = LOCAL_ALL_DONE
-    if(one_hot_state = LOCAL_ALL_DONE){
+    one_hot_state = one_hot_state | (1<<node_n)
+    // one_hot_state = LOCAL_ALL_DONE
+    if(LOCAL_ALL_DONE == one_hot_state){
         one_hot_state = LOCAL_RESET;
         global_sync_done_flag = 0b0;
         const pythonProcess = spawn('python3',['../federated_server.py']);
@@ -58,9 +58,9 @@ var base_path = __dirname + FILES_DIR;
 app.get('/get_global_param', function(req, res) {
     var filename = req.query.filename;
     var node_n = req.query.node_n;
-    one_hot_state = LOCAL_ALL_DONE;
-    // one_hot_state = one_hot_state | (1<<node_n)
-    if(one_hot_state = LOCAL_ALL_DONE){
+    // one_hot_state = LOCAL_ALL_DONE;
+    one_hot_state = one_hot_state | (1<<node_n)
+    if(LOCAL_ALL_DONE == one_hot_state){
         one_hot_state = LOCAL_RESET
         fed_avg_done_flag = 0b0;
         global_sync_done_flag = 0b1;
