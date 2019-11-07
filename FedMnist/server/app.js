@@ -10,7 +10,7 @@ const FILES_DIR = '/param_files/'
 var upload = multer({ dest: FILES_DIR});
 
 var one_hot_state = 0b000;
-var N_partitions = 3;
+var fed_avg_state = 0b111;
 
 app.get('/', (req, res) => res.send('Federated Learning - Server'))
 
@@ -19,12 +19,15 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
     var node_n = req.query.node_n;
     one_hot_state = one_hot_state | (1<<node_n)
     var file_destination = __dirname + '/param_files/' + req.file.originalname;
-    const pythonProcess = spawn('python',['federated_server.py']);
+    if(one_hot_state = fed_avg_state){
+        const pythonProcess = spawn('python',['federated_server.py']);
+    }
     fs.rename(req.file.path, file_destination, function(err) {
         if (err) {
             console.log(err);
             res.sendStatus(500);
         } else {
+            console.log("Successful Upload from: " + node_n);
             res.json({
                 message: 'File uploaded successfully',
                 filename: req.file.originalname
@@ -36,6 +39,11 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
 app.get('/fed_avg_done', function(req, res) {
     status = req.query.status
     console.log(status)
+    if(status == "success") {
+        res.sendStatus(200)
+    } else {
+        res.sendStatus(500)
+    }
 })
 
 var base_path = __dirname + FILES_DIR;
