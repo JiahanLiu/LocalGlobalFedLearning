@@ -44,7 +44,7 @@ def wait_fed_avg_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_FED_AVG_DONE_URL)
         r_json = r.json()
-        print("Waiting...")
+        print("Waiting on fed_avg_done...")
         time.sleep(1)
 
     return
@@ -55,7 +55,7 @@ def wait_global_sync_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_GLOBAL_SYNC_DONE_URL)
         r_json = r.json()
-        print("Waiting...")
+        print("Waiting on global_sync_done...")
         time.sleep(1)
     return
 
