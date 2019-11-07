@@ -13,13 +13,13 @@ We start by performing exploratory data anlysis using PCA and then use [Catboost
 PCA Results We also apply T-distributed Stochastic Neighbor Embedding to visualized the results in 2 dimensions. 
 
 <p align="center">
-  <img src="https://github.com/JiahanLiu/LocalGlobalFedLearning/blob/master/eda/pca_results/PCA.png">
+  <img src="https://github.com/JiahanLiu/LocalGlobalFedLearning/HumanActivityRecognition/blob/master/eda/pca_results/PCA.png">
 </p>
 
 Catboost Results
 
 <p align="center">
-  <img src="https://github.com/JiahanLiu/LocalGlobalFedLearning/blob/master/eda/catboost_results/Catboost_Results.png">
+  <img src="https://github.com/JiahanLiu/LocalGlobalFedLearning/HumanActivityRecognition/blob/master/eda/catboost_results/Catboost_Results.png">
 </p>
 
 
