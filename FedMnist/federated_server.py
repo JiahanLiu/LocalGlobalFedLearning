@@ -40,7 +40,6 @@ def fed_avg():
     local_params = [local_nets[i].parameters() for i in range(N_partitions)]
 
     global_net.aggregate_central(local_params)
-
     util.save_model_to_file(global_net.get_model(), build_global_param_path())
 
     payload = {'status': "success"}
