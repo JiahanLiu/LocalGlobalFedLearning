@@ -39,12 +39,16 @@ def download_global_param(download_url, file_path, file_name, node_n):
     print("File Downloaded")
 
 def wait_fed_avg_done():
+    wait_state = 0
     r = requests.get(QUERY_FED_AVG_DONE_URL)
     r_json = r.json()
     while(r_json['status'] == 0):
         r = requests.get(QUERY_FED_AVG_DONE_URL)
         r_json = r.json()
-        print("Waiting on fed_avg_done...")
+        wait_print = "\r Waiting on fed_avg_done"
+        for i in range(wait_state)
+            wait_print = wait_print + "."
+        print(wait_wait_printline)
         time.sleep(1)
 
     return
@@ -55,7 +59,10 @@ def wait_global_sync_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_GLOBAL_SYNC_DONE_URL)
         r_json = r.json()
-        print("Waiting on global_sync_done...")
+        wait_print = "\r Waiting on fed_avg_done"
+        for i in range(wait_state)
+            wait_print = wait_print + "."
+        print(wait_wait_printline)
         time.sleep(1)
     return
 
