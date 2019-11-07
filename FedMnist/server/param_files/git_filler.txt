@@ -1,0 +1,1 @@
+Git doesn't add empty directories. This directory is needed to save the pytorch files for federated_client.py. 
