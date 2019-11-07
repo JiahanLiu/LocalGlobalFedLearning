@@ -24,6 +24,16 @@ QUERY_GLOBAL_SYNC_DONE_URL = None
 
 PARAM_FILE_DIR = "client/param_files/"
 
+def wait_print(wait_state):
+    wait_print = "\rWaiting on fed_avg_done"
+    for i in range(wait_state):
+        wait_print = wait_print + "."
+    for i in range(3-wait_state):
+        wait_print = wait_print + " "
+    print(wait_print, flush=True, end =" ")
+
+    return (wait_state + 1) % 4
+
 def upload_local_param(upload_url, file_path, file_name, node_n):
     with open(file_path, 'rb') as file:
         files = {'file':(file_name, file)}
@@ -45,10 +55,7 @@ def wait_fed_avg_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_FED_AVG_DONE_URL)
         r_json = r.json()
-        wait_print = "\r Waiting on fed_avg_done"
-        for i in range(wait_state)
-            wait_print = wait_print + "."
-        print(wait_wait_printline)
+        wait_state = wait_print(wait_state)
         time.sleep(1)
 
     return
@@ -59,10 +66,7 @@ def wait_global_sync_done():
     while(r_json['status'] == 0):
         r = requests.get(QUERY_GLOBAL_SYNC_DONE_URL)
         r_json = r.json()
-        wait_print = "\r Waiting on fed_avg_done"
-        for i in range(wait_state)
-            wait_print = wait_print + "."
-        print(wait_wait_printline)
+        wait_state = wait_print(wait_state)
         time.sleep(1)
     return
 
