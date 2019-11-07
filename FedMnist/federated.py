@@ -89,6 +89,9 @@ class Aggregated_Model:
     def get_params(self):
         return self.model.parameters()
 
+    def get_model(self):
+        return self.model
+
     def get_test_loader(self):
         return self.test_loader
         
