@@ -10,6 +10,11 @@ import os.path
 import requests
 import sys
 
+DEVICE = torch.device("cpu")
+if torch.cuda.is_available():
+    DEVICE = torch.device("cuda")
+    print("Federated Using Cuda")
+
 SERVER_URL_BASE = None
 UPLOAD_URL = None
 DOWNLOAD_URL = None
@@ -56,7 +61,7 @@ def federated_local(network_architecture, get_train_loader, get_test_loader, n_e
     global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, global_param_file_name)
 
     net = federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions=1, node_id=0)
-    global_net = network_architecture()
+    global_net = network_architecture().to(device=DEVICE)
 
     for epoch in range(n_epochs):
         wait_global_sync_done()
@@ -66,7 +71,7 @@ def federated_local(network_architecture, get_train_loader, get_test_loader, n_e
         
         wait_fed_avg_done()
         download_global_param(DOWNLOAD_URL, global_param_file_path, global_param_file_name, node_n)
-        util.load_model_from_file(global_net, global_param_file_path)
+        util.load_model_from_file(global_net, global_param_file_path, DEVICE)
         updated_param = global_net.parameters()
         net.transfer_param_to_model(updated_param)
 
