@@ -11,6 +11,8 @@ We start by performing exploratory data anlysis using PCA and then use [Catboost
 ## Federated MNIST DEPLOYED to Raspberry Pi, Jetson Nano, Macbook, Linux Devices
 
 [Directory Root](https://github.com/JiahanLiu/LocalGlobalFedLearning/tree/master/FedMnist)
+[Server Main](https://github.com/JiahanLiu/LocalGlobalFedLearning/blob/master/FedMnist/server/app.js)
+[Client Main](https://github.com/JiahanLiu/LocalGlobalFedLearning/blob/master/FedMnist/federated_client.py)
 
 ## Human Activity Dataset
 
