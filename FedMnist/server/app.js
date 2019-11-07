@@ -20,14 +20,14 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
     one_hot_state = one_hot_state | (1<<node_n)
     var file_destination = __dirname + '/param_files/' + req.file.originalname;
     if(one_hot_state = fed_avg_state){
-        const pythonProcess = spawn('python',['federated_server.py']);
+        const pythonProcess = spawn('python3',['../federated_server.py']);
     }
     fs.rename(req.file.path, file_destination, function(err) {
         if (err) {
             console.log(err);
             res.sendStatus(500);
         } else {
-            console.log("Successful Upload from: " + node_n);
+            console.log("Yes, Upload from: " + node_n);
             res.json({
                 message: 'File uploaded successfully',
                 filename: req.file.originalname
@@ -54,7 +54,7 @@ app.get('/get_global_param', function(req, res) {
             console.log(err);
             res.sendStatus(500);
         } else {
-            console.log("Successful Download")
+            console.log("Yes, Download")
         }
     })
 })

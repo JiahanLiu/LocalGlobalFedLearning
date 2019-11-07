@@ -70,6 +70,18 @@ def fill_unbalanced_set(train_dataset, paritioned_train_sets, total_size, N_part
 
     return index
 
+def get_empty_train_loader(polymorphism_filler):
+    train_set = PartitionedDataset()
+    validation_set = PartitionedDataset()
+
+    train_set.__add__(torch.tensor([0]))
+    validation_set.__add__(torch.tensor([0]))
+
+    train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=BATCH_SIZE_TRAIN, shuffle=True)
+    validation_loader = torch.utils.data.DataLoader(dataset=validation_set, batch_size=VALIDATION_SIZE, shuffle=False)
+
+    return train_loader, validation_loader
+
 def get_unified_train_loader(polymorphism_filler):
     train_dataset = get_train_datasets()
 
