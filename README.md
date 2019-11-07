@@ -11,7 +11,7 @@ We start by performing exploratory data anlysis using PCA and then use [Catboost
 ## Federated MNIST DEPLOYED to Raspberry Pi, Jetson Nano, Macbook, Linux Devices
 
 ## Requirements
-Raspberry Pi Requirements: Unit torch is official supported on raspberry pi's armv7 architecture, install torch 1.3 using [natively compiled wheels](https://github.com/JiahanLiu/LocalGlobalFedLearning/tree/master/RaspberryPi4).
+Raspberry Pi Requirements: Unit torch is official supported on raspberry pi's armv7 architecture, install torch 1.3 using [natively compiled wheels](https://github.com/JiahanLiu/LocalGlobalFedLearning/tree/master/RaspberryPi4). If you need to compile the latest pytorch wheel, you can follow this [guide](Installing Pytorch on Pi: https://wormtooth.com/20180617-pytorch-on-raspberrypi/)
 
 ## Directory Structure 
 [Directory Root](https://github.com/JiahanLiu/LocalGlobalFedLearning/tree/master/FedMnist)
