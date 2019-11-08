@@ -4,7 +4,6 @@ import util
 
 import torch
 
-import configparser
 import json
 import os.path
 import requests
@@ -102,14 +101,15 @@ def main():
     global DOWNLOAD_URL
     global QUERY_GLOBAL_SYNC_DONE_URL
     global QUERY_FED_AVG_DONE_URL
-    config = configparser.RawConfigParser()
-    config.read('config.cfg')
-    SERVER_URL_BASE = config['CLIENT']['SERVER_URL_BASE']
-    UPLOAD_URL = SERVER_URL_BASE + config['CLIENT']['UPLOAD_ROUTE']
-    DOWNLOAD_URL = SERVER_URL_BASE + config['CLIENT']['DOWNLOAD_ROUTE']
-    QUERY_GLOBAL_SYNC_DONE_URL = SERVER_URL_BASE + config['CLIENT']['QUERY_GLOBAL_SYNC_DONE_ROUTE']
-    QUERY_FED_AVG_DONE_URL = SERVER_URL_BASE + config['CLIENT']['QUERY_FED_AVG_DONE_ROUTE']
-    N_EPOCHS = int(config['DEFAULT']['N_EPOCHS'])
+
+    with open('config.json') as config_file:
+        config = json.load(config_file)
+        SERVER_URL_BASE = config["networking"]["SERVER_URL_BASE"]
+        UPLOAD_URL = SERVER_URL_BASE + config['networking']['UPLOAD_ROUTE']
+        DOWNLOAD_URL = SERVER_URL_BASE + config['networking']['DOWNLOAD_ROUTE']
+        QUERY_GLOBAL_SYNC_DONE_URL = SERVER_URL_BASE + config['networking']['QUERY_GLOBAL_SYNC_DONE_ROUTE']
+        QUERY_FED_AVG_DONE_URL = SERVER_URL_BASE + config['networking']['QUERY_FED_AVG_DONE_ROUTE']
+        N_EPOCHS = int(config['machine_learning']['N_EPOCHS'])
 
     federated_local(nn_architectures.NetFC, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, node_n)
 
