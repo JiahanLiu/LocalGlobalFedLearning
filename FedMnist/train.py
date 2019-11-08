@@ -99,14 +99,14 @@ def main():
     N_partitions = 3
 
     with open('demo_results.csv', mode='w') as csv_file:
-            writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(['Semi-Balanced Percentage', 'Accuracy', 'Loss'])
-    for i in range(1):
-        get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loaders_closure(5 * i)   
-        (accuracy, loss) = fed_learning(nn_architectures.NetFC, get_semibalanced_partitioned_train_loader_fifty_percent, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions) 
-        with open('demo_results.csv', mode='w') as csv_file:
-            writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow([5 * i, accuracy, loss])
+        writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(['Semi-Balanced Percentage', 'Accuracy', 'Loss'])
+        for i in range(21):
+            get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loaders_closure(5 * i)   
+            (accuracy, loss) = fed_learning(nn_architectures.NetFC, get_semibalanced_partitioned_train_loader_fifty_percent, data_loader.get_unified_test_loader, N_EPOCHS, N_partitions) 
+            with open('demo_results.csv', mode='w') as csv_file:
+                writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                writer.writerow([5 * i, accuracy, loss])
 
     # central_learning(nn_architectures.NetFC, data_loader.get_unified_train_loader, data_loader.get_unified_test_loader, N_EPOCHS)
     
