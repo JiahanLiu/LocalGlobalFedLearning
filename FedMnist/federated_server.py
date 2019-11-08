@@ -46,7 +46,10 @@ def fed_avg(N_partitions):
     r = requests.get('http://localhost:3000/fed_avg_done', params=payload)
 
 def main():
-    with open('config.json') as config_file:
+    pwd_path = os.path.abspath(os.path.dirname(__file__))
+    config_file_name = 'config.json'
+    config_file_path = os.path.join(pwd_path, config_file_name)
+    with open(config_file_path) as config_file:
         config = json.load(config_file)
     N_partitions = config["server_only"]["N_partitions"]
     fed_avg(N_partitions)

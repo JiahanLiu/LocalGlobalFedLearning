@@ -1,5 +1,3 @@
-# from model import nn_architectures, data_loader
-
 import torch
 
 import os

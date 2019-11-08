@@ -1,6 +1,6 @@
 const express = require('express')
-var multer = require('multer');
-var fs = require('fs'); 
+const multer = require('multer');
+const fs = require('fs'); 
 const spawn = require("child_process").spawn;
 
 const app = express()
@@ -9,12 +9,14 @@ const port = 3000
 const FILES_DIR = '/param_files/'
 var upload = multer({ dest: FILES_DIR});
 
-const LOCAL_ALL_DONE = 0b111;
-const LOCAL_RESET = 0b000;
+const config = require('../config.json')
+const N_partitions = config.server_only.N_partitions
+const LOCAL_ALL_DONE = Math.pow(2, N_partitions) - 1;
+const LOCAL_RESET = 0;
 
-var one_hot_state = 0b000;
-var fed_avg_done_flag = 0b0;
-var global_sync_done_flag = 0b1; 
+var one_hot_state = 0; //one hot binary representation of state, bit n stands for node n
+var fed_avg_done_flag = 0;
+var global_sync_done_flag = 1; 
 
 app.get('/', (req, res) => res.send('Federated Learning - Server'))
 
@@ -22,9 +24,11 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
     var file_destination = __dirname + '/param_files/' + req.file.originalname;
     var node_n = req.query.node_n;
     one_hot_state = one_hot_state | (1<<node_n)
+    console.log(LOCAL_ALL_DONE)
+    console.log(one_hot_state)
     if(LOCAL_ALL_DONE == one_hot_state){
         one_hot_state = LOCAL_RESET;
-        global_sync_done_flag = 0b0;
+        global_sync_done_flag = 0;
         const pythonProcess = spawn('python3',['../federated_server.py']);
     }
     fs.rename(req.file.path, file_destination, function(err) {
@@ -45,7 +49,7 @@ app.get('/fed_avg_done', function(req, res) {
     status = req.query.status
     console.log(status)
     if(status == "success") {
-        fed_avg_done_flag = 0b1;
+        fed_avg_done_flag = 1;
         res.sendStatus(200)
     } else {
         res.sendStatus(500)
@@ -59,8 +63,8 @@ app.get('/get_global_param', function(req, res) {
     one_hot_state = one_hot_state | (1<<node_n)
     if(LOCAL_ALL_DONE == one_hot_state){
         one_hot_state = LOCAL_RESET
-        fed_avg_done_flag = 0b0;
-        global_sync_done_flag = 0b1;
+        fed_avg_done_flag = 0;
+        global_sync_done_flag = 1;
     }
     res.download(base_path+filename, filename, function (err) {
         if (err) {
