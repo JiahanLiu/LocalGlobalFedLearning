@@ -99,29 +99,20 @@ def get_unified_test_loader(polymorphism_filler):
     return test_loader
 
 def get_random_partitioned_train_loaders(N_partitions):
-    random_partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(100)
-    (train_loaders, validation_loader) = random_partitioned_train_loaders(N_partitions)
+    partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(100)
+    (train_loaders, validation_loader) = partitioned_train_loaders(N_partitions)
 
     return (train_loaders, validation_loader)
 
 def get_unbalanced_partitioned_train_loaders(N_partitions):
-    random_partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(0)
-    (train_loaders, validation_loader) = random_partitioned_train_loaders(N_partitions)
+    partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(0)
+    (train_loaders, validation_loader) = partitioned_train_loaders(N_partitions)
 
     return (train_loaders, validation_loader)
 
 def get_unbalanced_partitioned_test_loaders(N_partitions):
-    test_dataset = get_test_datasets()
-    
-    paritioned_test_sets = [PartitionedDataset() for n in range(N_partitions)]
-
-    total_size = len(test_dataset)
-    partition_cutoffs = [(math.floor(10 / N_partitions) * i) for i in range(0, N_partitions)]
-
-    index = 0
-    index = fill_unbalanced_set(test_dataset, paritioned_test_sets, total_size, N_partitions, partition_cutoffs, index)
-    
-    test_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=len(dataset), shuffle=False) for dataset in paritioned_test_sets]
+    partitioned_test_loaders = get_semibalanced_partitioned_test_loaders_closure(0)
+    test_loaders = partitioned_test_loaders(N_partitions)
 
     return test_loaders
 
@@ -150,3 +141,25 @@ def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced):
         return (train_loaders, validation_loader)
 
     return get_semibalanced_partitioned_train_loaders
+
+def get_semibalanced_partitioned_test_loaders_closure(percentage_balanced):
+
+    def get_semibalanced_partitioned_test_loaders(N_partitions):
+        test_dataset = get_test_datasets()
+
+        paritioned_test_sets = [PartitionedDataset() for n in range(N_partitions)]
+        total_size = len(test_dataset)
+        balanced_size = math.floor((total_size * percentage_balanced) / 100)
+        balanced_partition_size = math.floor(balanced_size / N_partitions)
+        unbalanced_size = total_size - balanced_size
+        partition_cutoffs = [(math.floor(10 / N_partitions) * i) for i in range(0, N_partitions)]
+
+        index = 0
+        index = fill_random_set(test_dataset, paritioned_test_sets, balanced_partition_size, N_partitions, index)
+        index = fill_unbalanced_set(test_dataset, paritioned_test_sets, total_size, N_partitions, partition_cutoffs, index)
+
+        test_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=len(dataset), shuffle=False) for dataset in paritioned_test_sets]
+
+        return test_loaders
+    
+    return get_semibalanced_partitioned_test_loaders
