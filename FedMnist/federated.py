@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-import configparser
+import json
 import random
 
 DEVICE = torch.device("cpu")
@@ -16,9 +16,9 @@ torch.manual_seed(random.random() * 100)
 
 class Local_Model:
     def __init__(self, network_architecture, get_train_loader, get_test_loader, N_partitions, node_id):
-        config = configparser.RawConfigParser()
-        config.read('config.cfg')
-        FC_LEARNING_RATE = float(config['DEFAULT']['FC_LEARNING_RATE'])
+        with open('config.json') as config_file:
+            config = json.load(config_file)
+            FC_LEARNING_RATE = float(config['machine_learning']['FC_LEARNING_RATE'])
 
         train_loaders, validation_loader = get_train_loader(N_partitions)
         test_loaders = get_test_loader(N_partitions)
