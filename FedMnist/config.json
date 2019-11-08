@@ -9,5 +9,8 @@
         "DOWNLOAD_ROUTE": "get_global_param",
         "QUERY_GLOBAL_SYNC_DONE_ROUTE": "query_global_sync_done",
         "QUERY_FED_AVG_DONE_ROUTE": "query_fed_avg_done"
+    },
+    "server_only": {
+        "N_partitions": 3
     }
 }

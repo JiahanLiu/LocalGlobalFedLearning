@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-import configparser
+import json
 import random
     
 print("Torch Version: " + torch.__version__)
@@ -68,9 +68,9 @@ def local_learning(network_architecture, get_train_loader, get_test_loader, n_ep
         print("Epoch: " + str(epoch) + " | Avg_L_Accuracy: " + str(avg_local_accuracy) + " | Avg_L_Loss: " + str(avg_local_loss.item()))
 
 def main(): 
-    config = configparser.RawConfigParser()
-    config.read('config.cfg')
-    N_EPOCHS = int(config['DEFAULT']['N_EPOCHS'])
+    with open('config.json') as config_file:
+        config = json.load(config_file)
+        N_EPOCHS = int(config['machine_learning']['N_EPOCHS'])
 
     # get_semibalanced_partitioned_train_loader_fifty_percent = data_loader.get_semibalanced_partitioned_train_loaders_closure(50)
     

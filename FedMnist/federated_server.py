@@ -4,6 +4,7 @@ import util
 
 import torch
 
+import json
 import os
 import requests
 import sys
@@ -27,10 +28,9 @@ def build_global_param_path():
     global_param_file_path = os.path.join(pwd_path, PARAM_FILE_DIR, global_param_file_name)
     return global_param_file_path
 
-def fed_avg():
+def fed_avg(N_partitions):
     network_architecture = nn_architectures.NetFC
     get_test_loader = data_loader.get_unified_test_loader
-    N_partitions = 3
 
     local_nets = [network_architecture() for i in range(N_partitions)]
     global_net = federated.Aggregated_Model(network_architecture, get_test_loader, N_partitions)
@@ -46,7 +46,10 @@ def fed_avg():
     r = requests.get('http://localhost:3000/fed_avg_done', params=payload)
 
 def main():
-    fed_avg()
+    with open('config.json') as config_file:
+        config = json.load(config_file)
+    N_partitions = config["server_only"]["N_partitions"]
+    fed_avg(N_partitions)
 
 if __name__ == "__main__":
     main()
