@@ -20,12 +20,10 @@ var global_sync_done_flag = 1;
 
 app.get('/', (req, res) => res.send('Federated Learning - Server'))
 
-app.post('/upload_local_param', upload.single('file'), function(req, res) {
+app.post('/' + config.networking.UPLOAD_ROUTE, upload.single('file'), function(req, res) {
     var file_destination = __dirname + '/param_files/' + req.file.originalname;
     var node_n = req.query.node_n;
     one_hot_state = one_hot_state | (1<<node_n)
-    console.log(LOCAL_ALL_DONE)
-    console.log(one_hot_state)
     if(LOCAL_ALL_DONE == one_hot_state){
         one_hot_state = LOCAL_RESET;
         global_sync_done_flag = 0;
@@ -45,7 +43,7 @@ app.post('/upload_local_param', upload.single('file'), function(req, res) {
     });
 });
 
-app.get('/fed_avg_done', function(req, res) {
+app.get('/' + config.networking.FED_AVG_DONE_ROUTE, function(req, res) {
     status = req.query.status
     console.log(status)
     if(status == "success") {
@@ -57,7 +55,7 @@ app.get('/fed_avg_done', function(req, res) {
 })
 
 var base_path = __dirname + FILES_DIR;
-app.get('/get_global_param', function(req, res) {
+app.get('/' + config.networking.DOWNLOAD_ROUTE, function(req, res) {
     var filename = req.query.filename;
     var node_n = req.query.node_n;
     one_hot_state = one_hot_state | (1<<node_n)
@@ -76,13 +74,13 @@ app.get('/get_global_param', function(req, res) {
     })
 })
 
-app.get('/query_global_sync_done', function(req, res) {
+app.get('/' + config.networking.QUERY_GLOBAL_SYNC_DONE_ROUTE, function(req, res) {
     res.json({
         status: global_sync_done_flag
     });
 })
 
-app.get('/query_fed_avg_done', function(req, res) {
+app.get('/' + config.networking.QUERY_FED_AVG_DONE_ROUTE, function(req, res) {
     res.json({
         status: fed_avg_done_flag
     });
