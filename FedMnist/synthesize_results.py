@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 def print_shapes(test_loader):
     examples = enumerate(test_loader)
     batch_idx, (example_data, example_targets) = next(examples)
