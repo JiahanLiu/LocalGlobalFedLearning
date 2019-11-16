@@ -41,11 +41,11 @@ def get_test_datasets():
     
     return test_dataset
 
-def fill_validation_set(train_dataset, validation_set, index):
-    for j in range(VALIDATION_SIZE):
+def fill_set_straight(train_dataset, target_set, target_set_size, index):
+    for j in range(target_set_size):
         item = train_dataset.__getitem__(index)
         index = index + 1
-        validation_set.__add__(item)
+        target_set.__add__(item)
 
     return index
 
@@ -58,15 +58,15 @@ def fill_random_set(train_dataset, paritioned_train_sets, partition_size, N_part
     
     return index
 
-def fill_unbalanced_set(train_dataset, paritioned_train_sets, total_size, N_partitions, partition_cutoffs, index):
+def fill_unbalanced_set(train_dataset, paritioned_target_sets, total_size, N_partitions, partition_cutoffs, index):
     for i in range(total_size):
         item = train_dataset.__getitem__(index)
         index = index + 1
         for i in range(N_partitions-1):
             if ((partition_cutoffs[i] <= item[1]) and (item[1] < partition_cutoffs[i+1])):
-                paritioned_train_sets[i].__add__(item)
+                paritioned_target_sets[i].__add__(item)
         if (partition_cutoffs[N_partitions-1] <= item[1]):
-            paritioned_train_sets[N_partitions-1].__add__(item)
+            paritioned_target_sets[N_partitions-1].__add__(item)
 
     return index
 
@@ -79,7 +79,7 @@ def get_unified_train_loader(polymorphism_filler):
     partition_size = len(train_dataset) - VALIDATION_SIZE
 
     index = 0
-    index = fill_validation_set(train_dataset, validation_set, index)
+    index = fill_set_straight(train_dataset, validation_set, VALIDATION_SIZE, index)
     for j in range(partition_size):
         item = train_dataset.__getitem__(index)
         index = index + 1
@@ -117,12 +117,15 @@ def get_unbalanced_partitioned_test_loaders(N_partitions):
     return test_loaders
 
 def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced):
-
     def get_semibalanced_partitioned_train_loaders(N_partitions):
         train_dataset = get_train_datasets()
 
-        validation_set = PartitionedDataset()
+        partitioned_validation_sets = [PartitionedDataset() for n in range(N_partitions)]
         paritioned_train_sets = [PartitionedDataset() for n in range(N_partitions)]
+
+        validation_balanced_size = math.floor((VALIDATION_SIZE * percentage_balanced) / 100)
+        validation_balanced_partition_size = math.floor(validation_balanced_size / N_partitions)
+        validation_unbalanced_size = VALIDATION_SIZE - validation_balanced_size
 
         total_size = math.floor((len(train_dataset) - VALIDATION_SIZE))
         balanced_size = math.floor((total_size * percentage_balanced) / 100)
@@ -131,19 +134,19 @@ def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced):
         partition_cutoffs = [(math.floor(10 / N_partitions) * i) for i in range(0, N_partitions)]
 
         index = 0
-        index = fill_validation_set(train_dataset, validation_set, index)
+        index = fill_random_set(train_dataset, partitioned_validation_sets, validation_balanced_partition_size, N_partitions, index)
+        index = fill_unbalanced_set(train_dataset, partitioned_validation_sets, validation_unbalanced_size, N_partitions, partition_cutoffs, index)
         index = fill_random_set(train_dataset, paritioned_train_sets, balanced_partition_size, N_partitions, index)
         index = fill_unbalanced_set(train_dataset, paritioned_train_sets, unbalanced_size, N_partitions, partition_cutoffs, index)
 
         train_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=BATCH_SIZE_TRAIN, shuffle=True) for dataset in paritioned_train_sets]
-        validation_loader = torch.utils.data.DataLoader(dataset=validation_set, batch_size=VALIDATION_SIZE, shuffle=False)
+        validation_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=VALIDATION_SIZE, shuffle=False) for dataset in partitioned_validation_sets]
 
-        return (train_loaders, validation_loader)
+        return (train_loaders, validation_loaders)
 
     return get_semibalanced_partitioned_train_loaders
 
 def get_semibalanced_partitioned_test_loaders_closure(percentage_balanced):
-
     def get_semibalanced_partitioned_test_loaders(N_partitions):
         test_dataset = get_test_datasets()
 

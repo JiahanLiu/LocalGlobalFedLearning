@@ -3,10 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F 
 import torch.optim as optim
 
-class NetFC(nn.Module):
+class NetFC_1(nn.Module):
 
     def __init__(self):
-        super(NetFC, self).__init__()
+        super(NetFC_1, self).__init__()
 
         self.z1 = nn.Linear(784, 30)
         self.z2_output = nn.Linear(30, 10)

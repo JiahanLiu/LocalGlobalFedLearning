@@ -1,7 +1,10 @@
 {
     "machine_learning": {
         "N_EPOCHS": 30, 
-        "FC_LEARNING_RATE": 0.001
+        "EPOCH_SATURATION": 20, 
+        "MAX_EPOCHS": 100,
+        "FC_LEARNING_RATE": 0.001,
+        "DATA_PARALLEL": false
     },
     "networking": {
         "SERVER_URL_BASE": "http://167.71.247.3:3000/",

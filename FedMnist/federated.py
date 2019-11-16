@@ -19,19 +19,29 @@ class Local_Model:
         with open('config.json') as config_file:
             config = json.load(config_file)
             FC_LEARNING_RATE = float(config['machine_learning']['FC_LEARNING_RATE'])
+            DATA_PARALLEL = config['machine_learning']['FC_LEARNING_RATE']
 
-        train_loaders, validation_loader = get_train_loader(N_partitions)
+        train_loaders, validation_loaders = get_train_loader(N_partitions)
         test_loaders = get_test_loader(N_partitions)
         
         self.test_loader = test_loaders
         if(len(test_loaders) > 1):
             self.test_loader = test_loaders[node_id]
+
         self.train_loader = train_loaders
         if(N_partitions != 0):
             self.train_loader = train_loaders[node_id] 
+
+        self.validation_loader = validation_loaders
+        if(N_partitions != 0):
+            self.validation_loader = validation_loaders[node_id]
+
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=FC_LEARNING_RATE)
+
+        if DATA_PARALLEL and torch.cuda.is_available() and (torch.cuda.device_count() > 1):
+            self.model = nn.DataParallel(self.model)
 
         nn_architectures.xavier_init(self.model)
 
@@ -55,6 +65,9 @@ class Local_Model:
     def get_accuracy(self):
         acc = evaluate.accuracy(self.model, self.test_loader)
         return acc
+
+    def get_validation_accuracy(self):
+        return evaluate.accuracy(self.model, self.validation_loader)
 
     def get_loss(self):
         loss = evaluate.loss(self.model, self.train_loader, self.loss_fn)

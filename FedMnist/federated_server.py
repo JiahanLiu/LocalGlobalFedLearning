@@ -29,7 +29,7 @@ def build_global_param_path():
     return global_param_file_path
 
 def fed_avg(N_partitions):
-    network_architecture = nn_architectures.NetFC
+    network_architecture = nn_architectures.NetFC_1
     get_test_loader = data_loader.get_unified_test_loader
 
     local_nets = [network_architecture() for i in range(N_partitions)]
