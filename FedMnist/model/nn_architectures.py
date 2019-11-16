@@ -19,7 +19,7 @@ class NetFC_1(nn.Module):
 
         return x
 
-# Takes too long to train on CPU, haven't validated for hyper parameters
+# Takes too long to hyperparameter validate on CPU
 class NetCNN(nn.Module):
     def __init__(self):
         super(NetCNN, self).__init__()
@@ -40,7 +40,7 @@ class NetCNN(nn.Module):
 
         return x
 
-def xavier_init(model):
+def parameter_init(model):
     if type(model) == nn.Linear:
-        torch.nn.init.xavier_uniform(model.weight)
+        torch.nn.init.kaiming_uniform_(model.weight, nonlinearity='relu')
         model.bias.data.fill_(0.01)

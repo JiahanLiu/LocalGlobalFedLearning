@@ -15,11 +15,10 @@ if torch.cuda.is_available():
 torch.manual_seed(random.random() * 100)
 
 class Local_Model:
-    def __init__(self, network_architecture, get_train_loader, get_test_loader, N_partitions, node_id):
+    def __init__(self, network_architecture, get_train_loader, get_test_loader, N_partitions, node_id, learning_rate):
         with open('config.json') as config_file:
             config = json.load(config_file)
-            FC_LEARNING_RATE = float(config['machine_learning']['FC_LEARNING_RATE'])
-            DATA_PARALLEL = config['machine_learning']['FC_LEARNING_RATE']
+            DATA_PARALLEL = config['machine_learning']['DATA_PARALLEL']
 
         train_loaders, validation_loaders = get_train_loader(N_partitions)
         test_loaders = get_test_loader(N_partitions)
@@ -38,12 +37,13 @@ class Local_Model:
 
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=FC_LEARNING_RATE)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
 
         if DATA_PARALLEL and torch.cuda.is_available() and (torch.cuda.device_count() > 1):
+            print("Using Data Parallel")
             self.model = nn.DataParallel(self.model)
 
-        nn_architectures.xavier_init(self.model)
+        nn_architectures.parameter_init(self.model)
 
     def transfer_param_to_model(self, param):
         for w_model, w_param in zip(self.model.parameters(), param):
@@ -82,7 +82,7 @@ class Aggregated_Model:
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
 
-        nn_architectures.xavier_init(self.model)
+        nn_architectures.parameter_init(self.model)
 
     def aggregate_central(self, local_params):
         N_partitions = len(local_params)

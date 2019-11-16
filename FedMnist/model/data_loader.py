@@ -70,25 +70,27 @@ def fill_unbalanced_set(train_dataset, paritioned_target_sets, total_size, N_par
 
     return index
 
-def get_unified_train_loader(polymorphism_filler):
-    train_dataset = get_train_datasets()
+def get_unified_train_loader_closure(batch_size):
+    def get_unified_train_loader(polymorphism_filler):
+        train_dataset = get_train_datasets()
 
-    train_set = PartitionedDataset()
-    validation_set = PartitionedDataset()
+        train_set = PartitionedDataset()
+        validation_set = PartitionedDataset()
 
-    partition_size = len(train_dataset) - VALIDATION_SIZE
+        partition_size = len(train_dataset) - VALIDATION_SIZE
 
-    index = 0
-    index = fill_set_straight(train_dataset, validation_set, VALIDATION_SIZE, index)
-    for j in range(partition_size):
-        item = train_dataset.__getitem__(index)
-        index = index + 1
-        train_set.__add__(item)
+        index = 0
+        index = fill_set_straight(train_dataset, validation_set, VALIDATION_SIZE, index)
+        for j in range(partition_size):
+            item = train_dataset.__getitem__(index)
+            index = index + 1
+            train_set.__add__(item)
 
-    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE_TRAIN, shuffle=True)
-    validation_loader = torch.utils.data.DataLoader(dataset=validation_set, batch_size=VALIDATION_SIZE, shuffle=False)
+        train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+        validation_loader = torch.utils.data.DataLoader(dataset=validation_set, batch_size=VALIDATION_SIZE, shuffle=False)
 
-    return train_loader, validation_loader
+        return train_loader, validation_loader
+    return get_unified_train_loader
 
 def get_unified_test_loader(polymorphism_filler):
     test_dataset = get_test_datasets()
@@ -98,17 +100,21 @@ def get_unified_test_loader(polymorphism_filler):
 
     return test_loader
 
-def get_random_partitioned_train_loaders(N_partitions):
-    partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(100)
-    (train_loaders, validation_loader) = partitioned_train_loaders(N_partitions)
+def get_random_partitioned_train_loaders_closure(batch_size):
+    def get_random_partitioned_train_loaders(N_partitions):
+        partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(100, batch_size)
+        (train_loaders, validation_loader) = partitioned_train_loaders(N_partitions)
 
-    return (train_loaders, validation_loader)
+        return (train_loaders, validation_loader)
+    return get_random_partitioned_train_loaders
 
-def get_unbalanced_partitioned_train_loaders(N_partitions):
-    partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(0)
-    (train_loaders, validation_loader) = partitioned_train_loaders(N_partitions)
+def get_unbalanced_partitioned_train_loaders_closure(batch_size):
+    def get_unbalanced_partitioned_train_loaders(N_partitions):
+        partitioned_train_loaders = get_semibalanced_partitioned_train_loaders_closure(0, batch_size)
+        (train_loaders, validation_loader) = partitioned_train_loaders(N_partitions)
 
-    return (train_loaders, validation_loader)
+        return (train_loaders, validation_loader)
+    return get_unbalanced_partitioned_train_loaders
 
 def get_unbalanced_partitioned_test_loaders(N_partitions):
     partitioned_test_loaders = get_semibalanced_partitioned_test_loaders_closure(0)
@@ -116,7 +122,7 @@ def get_unbalanced_partitioned_test_loaders(N_partitions):
 
     return test_loaders
 
-def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced):
+def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced, batch_size):
     def get_semibalanced_partitioned_train_loaders(N_partitions):
         train_dataset = get_train_datasets()
 
@@ -139,7 +145,7 @@ def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced):
         index = fill_random_set(train_dataset, paritioned_train_sets, balanced_partition_size, N_partitions, index)
         index = fill_unbalanced_set(train_dataset, paritioned_train_sets, unbalanced_size, N_partitions, partition_cutoffs, index)
 
-        train_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=BATCH_SIZE_TRAIN, shuffle=True) for dataset in paritioned_train_sets]
+        train_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True) for dataset in paritioned_train_sets]
         validation_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=VALIDATION_SIZE, shuffle=False) for dataset in partitioned_validation_sets]
 
         return (train_loaders, validation_loaders)
