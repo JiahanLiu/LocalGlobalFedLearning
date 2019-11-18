@@ -12,7 +12,6 @@ from torchvision import datasets, transforms
 import csv
 import getopt
 import json
-import random
 import sys
 
 def print_results(epoch_n, loss, validation_accuracy, acc):

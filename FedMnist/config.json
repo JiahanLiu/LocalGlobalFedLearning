@@ -5,11 +5,10 @@
         "EPOCH_SATURATION": 20, 
         "MAX_EPOCHS": 100,
         "FC_LEARNING_RATE": 0.001,
-        "DATA_PARALLEL": false,
-        "RANDOM_SEED": 90
+        "DATA_PARALLEL": false
     },
     "hyperparameter_search" : {
-        "CENTRAL_NETFC1_BALANCED100_FILE": "hyperparameter_search/central_NetFC1_balance100.csv"
+        "CENTRAL_NETFC1_BALANCED100_FILE": "hyperparameter_search/fed_NetFC1_balance100.csv"
     },
     "networking": {
         "SERVER_URL_BASE": "http://167.71.247.3:3000/",
