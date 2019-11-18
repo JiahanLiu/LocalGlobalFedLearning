@@ -42,12 +42,13 @@ def search_fed_model(n_iterations, gpu_n):
         optimal_epoch, random_batch_size, random_learning_rate, opt_loss, opt_val_acc, opt_acc = search_fed_model_single()
         write_results(CENTRAL_NETFC1_BALANCED100_FILE, str(optimal_epoch), str(random_batch_size), str(random_learning_rate), str(opt_loss), str(opt_val_acc), str(opt_acc))
 
-
 def search_fed_model_single():
     stop_at_epoch_saturation = train.stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
+    batch_size_options = [16, 32, 64, 128, 256, 512, 1024, 2048]
+
     random_learning_rate = (random.random() * 10000) * math.pow(10, -5)
-    random_batch_size = random.randrange(5, 5000)
+    random_batch_size = batch_size_options(random.randrange(0, len(batch_size_options)))
 
     get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(batch_size=random_batch_size)
     optimal_epoch, opt_loss, opt_val_acc, opt_acc = train.fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, 
@@ -72,6 +73,24 @@ def write_results(file_path, optimal_epoch, batch_size, learning_rate, opt_loss,
         writer.writerow(result_row)
         fcntl.flock(f, fcntl.LOCK_UN) 
 
+def pull_top_results(file_path):
+    opt_20_list = []
+    with open(file_path, 'r') as f:
+        readCSV = csv.reader(f)
+        for index, row in enumerate(readCSV):
+            if 0 == index:
+                doNothing = 0
+            elif index < 20+1:
+                opt_20_list.append([int(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])])
+            else:
+                opt_20_list.sort(key = lambda x: x[4], reverse=True)
+                if(opt_20_list[19][4] < float(row[4])):
+                    opt_20_list[9] = [int(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])]
+    
+    for row in opt_20_list:
+        print_results(str(row[0]), str(row[1]), str(row[2]), str(row[3]), str(row[4]), str(row[5]))
+            
+
 def main(): 
     options, remainder = getopt.getopt(sys.argv[1:], 'g:')
     for opt, arg in options:
@@ -79,7 +98,8 @@ def main():
             gpu_n = arg
 
     init()
-    search_fed_model(100, gpu_n)
+    # search_fed_model(100, gpu_n)
+    pull_top_results(CENTRAL_NETFC1_BALANCED100_FILE)
 
 if __name__ == "__main__":
     main()
