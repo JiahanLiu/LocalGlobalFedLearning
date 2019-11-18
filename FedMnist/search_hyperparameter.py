@@ -48,7 +48,7 @@ def search_fed_model_single():
     batch_size_options = [16, 32, 64, 128, 256, 512, 1024, 2048]
 
     random_learning_rate = (random.random() * 10000) * math.pow(10, -5)
-    random_batch_size = batch_size_options(random.randrange(0, len(batch_size_options)))
+    random_batch_size = batch_size_options[random.randrange(0, len(batch_size_options))]
 
     get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(batch_size=random_batch_size)
     optimal_epoch, opt_loss, opt_val_acc, opt_acc = train.fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, 
@@ -98,8 +98,8 @@ def main():
             gpu_n = arg
 
     init()
-    # search_fed_model(100, gpu_n)
-    pull_top_results(CENTRAL_NETFC1_BALANCED100_FILE)
+    search_fed_model(20, gpu_n)
+    # pull_top_results(CENTRAL_NETFC1_BALANCED100_FILE)
 
 if __name__ == "__main__":
     main()
