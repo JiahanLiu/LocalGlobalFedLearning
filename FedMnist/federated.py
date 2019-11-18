@@ -108,3 +108,11 @@ class Aggregated_Model:
     def get_test_loader(self):
         return self.test_loader
         
+def set_device(device):
+    global DEVICE
+    if torch.cuda.is_available():
+        DEVICE = torch.device(device)
+
+def get_device():
+    global DEVICE
+    return DEVICE

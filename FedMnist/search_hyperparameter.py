@@ -1,11 +1,18 @@
+import federated
 from model import nn_architectures, data_loader
 import train
 
+import torch
+
 import csv
+import fcntl
+import getopt
 import json
 import math
+from multiprocessing import Pool
 import os.path
 import random
+import sys
 
 N_PARTITIONS = 0
 EPOCH_SATURATION = 0
@@ -29,17 +36,18 @@ def print_results(optimal_epoch, batch_size, learning_rate, opt_loss, opt_valida
     print("Opt Epoch: " + optimal_epoch + " | Batch Size: " + batch_size + " | Learning Rate: " + learning_rate + " | Opt Loss: " + opt_loss 
         + " | Opt Val Acc: " + opt_validation_accuracy + " | Opt Acc: " + opt_acc)
 
-def search_fed_model(n_iterations):
+def search_fed_model(n_iterations, gpu_n):
+    federated.set_device("cuda:" + str(gpu_n))
     for i in range(n_iterations):
         optimal_epoch, random_batch_size, random_learning_rate, opt_loss, opt_val_acc, opt_acc = search_fed_model_single()
         write_results(CENTRAL_NETFC1_BALANCED100_FILE, str(optimal_epoch), str(random_batch_size), str(random_learning_rate), str(opt_loss), str(opt_val_acc), str(opt_acc))
 
+
 def search_fed_model_single():
-    random.seed(random.randrange(10, 1000))
     stop_at_epoch_saturation = train.stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
-    random_learning_rate = (random.random() * 100) * math.pow(10, -4)
-    random_batch_size = random.randrange(10, 1000)
+    random_learning_rate = (random.random() * 10000) * math.pow(10, -5)
+    random_batch_size = random.randrange(5, 5000)
 
     get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(batch_size=random_batch_size)
     optimal_epoch, opt_loss, opt_val_acc, opt_acc = train.fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, 
@@ -59,13 +67,19 @@ def write_results(file_path, optimal_epoch, batch_size, learning_rate, opt_loss,
 
     result_row=[optimal_epoch, batch_size, learning_rate, opt_loss, opt_val_acc, opt_acc]
     with open(file_path, 'a') as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
         writer = csv.writer(f)
         writer.writerow(result_row)
+        fcntl.flock(f, fcntl.LOCK_UN) 
 
 def main(): 
-    init()
+    options, remainder = getopt.getopt(sys.argv[1:], 'g:')
+    for opt, arg in options:
+        if opt in ('-g'):
+            gpu_n = arg
 
-    search_fed_model(1)
+    init()
+    search_fed_model(100, gpu_n)
 
 if __name__ == "__main__":
     main()
