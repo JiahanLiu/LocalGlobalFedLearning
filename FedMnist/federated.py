@@ -24,7 +24,7 @@ class Local_Model:
         test_loaders = get_test_loader(N_partitions)
         
         self.test_loader = test_loaders
-        if(len(test_loaders) > 1):
+        if(N_partitions != 0):
             self.test_loader = test_loaders[node_id]
 
         self.train_loader = train_loaders

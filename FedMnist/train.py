@@ -15,44 +15,33 @@ import json
 import random
 import sys
 
+def print_results(epoch_n, loss, validation_accuracy, acc):
+    print("Epoch: " + epoch_n + " | Loss: " + loss + " | ValAcc: " + validation_accuracy + " | Acc: " + acc)
+
 def central_learning(network_architecture, get_train_loader, get_test_loader, end_function, learning_rate):
     net = federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions=0, node_id=0, learning_rate=learning_rate)
 
     end_condition = False
     epoch_n = 0
+    losses = []
     validation_accuracies = []
+    accuracies = []
     while False == end_condition:
         (loss_i, local_param_i) = net.train()
         loss = net.get_loss()
         validation_accuracy = net.get_validation_accuracy()
         acc = net.get_accuracy()
 
+        losses.append(loss)
         validation_accuracies.append(validation_accuracy)
-        epoch_n = epoch_n + 1
+        accuracies.append(acc)
         end_condition, optimal_epoch = end_function(epoch_n, validation_accuracies)
 
-        print("Epoch: " + str(epoch_n) + " | Accuracy: " + str(acc) + " | Loss: " + str(loss.item()))
+        print_results(epoch_n = str(epoch_n), loss=str(loss.item()), validation_accuracy=str(validation_accuracy), acc=str(acc))
+
+        epoch_n = epoch_n + 1
     
-    return optimal_epoch, validation_accuracies[optimal_epoch]
-
-def central_learning_split_interweaved(network_architecture, get_unified_loader, get_partitioned_loader, get_test_loader, N_partitions):
-    (train_loaders, validation_loader) = get_partitioned_loader(N_partitions)
-    test_loader = get_test_loader(N_partitions)
-
-    # net = network_architecture().to(device=DEVICE)
-    # loss_fn = nn.NLLLoss()
-    # optimizer = optim.Adam(net.parameters(), lr=FC_LEARNING_RATE)
-
-    # init_weights(net)
-    # for epoch in range(N_EPOCHS):
-    #     losses = []
-    #     for i in range(N_partitions): 
-    #         (loss_i, local_param_i) = train_epoch(model=net, train_loader=train_loaders[i], loss_fn=loss_fn, optimizer=optimizer)
-    #         losses.append(loss_i)
-    #     acc = evaluate.accuracy(model=net, data_loader=test_loader)
-    #     avg_loss = sum(losses) / len(losses)
-
-    #     print("Epoch: " + str(epoch) + " | Accuracy: " + str(acc) + " | Loss: " + str(avg_loss.item()))
+    return (optimal_epoch, losses[optimal_epoch], validation_accuracies[optimal_epoch], accuracies[optimal_epoch])
 
 def fed_learning(network_architecture, get_train_loader, get_test_loader, N_partitions, end_function, learning_rate):
     local_nets = [federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions, node_i, learning_rate) for node_i in range(N_partitions)]
@@ -60,7 +49,9 @@ def fed_learning(network_architecture, get_train_loader, get_test_loader, N_part
 
     end_condition = False
     epoch_n = 0
+    avg_local_losses = []
     avg_local_validation_accuracies = []
+    avg_local_accuracies = []
     while False == end_condition:
         local_params = []
         local_losses = []
@@ -80,20 +71,25 @@ def fed_learning(network_architecture, get_train_loader, get_test_loader, N_part
         avg_local_validation_accuracy = sum(local_validation_accuracies) / len(local_validation_accuracies)
         avg_local_accuracy = sum(local_accuracies) / len(local_accuracies)
         
+        avg_local_losses.append(avg_local_loss)
         avg_local_validation_accuracies.append(avg_local_validation_accuracy)
+        avg_local_accuracies.append(avg_local_accuracy)
+        end_condition, optimal_epoch = end_function(epoch_n, avg_local_validation_accuracies)
+
+        print_results(epoch_n = str(epoch_n), loss=str(avg_local_loss.item()), validation_accuracy=str(avg_local_validation_accuracy), acc=str(avg_local_accuracy))
+        
         epoch_n = epoch_n + 1
-        end_condition = end_function(epoch_n, avg_local_validation_accuracies)
 
-        print("Epoch: " + str(epoch_n) + " | Accuracy: " + str(avg_local_accuracy) + " | Loss: " + str(avg_local_loss.item()))
-
-    return (avg_local_accuracy, avg_local_loss.item(), epoch_n)
+    return (optimal_epoch, avg_local_losses[optimal_epoch], avg_local_validation_accuracies[optimal_epoch], avg_local_accuracies[optimal_epoch])
 
 def local_learning(network_architecture, get_train_loader, get_test_loader, N_partitions, end_function, learning_rate):
     local_nets = [federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions, node_i, learning_rate) for node_i in range(N_partitions)]
 
     end_condition = False
     epoch_n = 0
+    avg_local_losses = []
     avg_local_validation_accuracies = []
+    avg_local_accuracies = []
     while False == end_condition:
         local_losses = []
         local_validation_accuracies = []
@@ -108,18 +104,23 @@ def local_learning(network_architecture, get_train_loader, get_test_loader, N_pa
         avg_local_validation_accuracy = sum(local_validation_accuracies) / len(local_validation_accuracies)
         avg_local_accuracy = sum(local_accuracies) / len(local_accuracies)
 
+        avg_local_losses.append(avg_local_loss)
         avg_local_validation_accuracies.append(avg_local_validation_accuracy)
-        epoch_n = epoch_n + 1
-        end_condition = end_function(epoch_n, avg_local_validation_accuracies)
+        avg_local_accuracies.append(avg_local_accuracy)
+        end_condition, optimal_epoch = end_function(epoch_n, avg_local_validation_accuracies)
 
-        print("Epoch: " + str(epoch_n) + " | Avg_L_Accuracy: " + str(avg_local_accuracy) + " | Avg_L_Loss: " + str(avg_local_loss.item()))
+        print_results(epoch_n = str(epoch_n), loss=str(avg_local_loss.item()), validation_accuracy=str(avg_local_validation_accuracy), acc=str(avg_local_accuracy))
+
+        epoch_n = epoch_n + 1
+
+    return (optimal_epoch, avg_local_losses[optimal_epoch], avg_local_validation_accuracies[optimal_epoch], avg_local_accuracies[optimal_epoch])
 
 def stop_at_N_epochs_closure(N_epoch):
     def end_N_epochs(n_epoch, measures):
-        if(n_epoch < N_epoch):
-            return False, N_epoch
+        if(n_epoch < N_epoch - 1):
+            return False, N_epoch-1
         else:
-            return True, N_epoch
+            return True, N_epoch-1
 
     return end_N_epochs
 
@@ -173,10 +174,10 @@ def main():
     #         writer.writerow(row)
 
     # get_unified_train_loader = data_loader.get_unified_train_loader_closure(batch_size=256)
-    # central_learning(nn_architectures.NetFC_1, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_N_epochs, FC_LEARNING_RATE)
+    # central_learning(nn_architectures.NetFC_1, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_epoch_saturation, FC_LEARNING_RATE)
     
-    # get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(batch_size=256)
-    # fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
+    get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(batch_size=256)
+    fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_random_partitioned_test_loaders, N_PARTITIONS, stop_at_epoch_saturation, FC_LEARNING_RATE)
     # local_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
     
     # get_unbalanced_partitioned_train_loaders = data_loader.get_unbalanced_partitioned_train_loaders_closure(batch_size=256)
