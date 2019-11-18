@@ -98,7 +98,7 @@ def main():
             gpu_n = arg
 
     init()
-    search_fed_model(20, gpu_n)
+    search_fed_model(100, gpu_n)
     # pull_top_results(CENTRAL_NETFC1_BALANCED100_FILE)
 
 if __name__ == "__main__":
