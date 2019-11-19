@@ -57,14 +57,16 @@ def fed_learning(network_architecture, get_train_loader, get_test_loader, N_part
         local_validation_accuracies = []
         local_accuracies = []
         for i in range(N_partitions): 
-            local_nets[i].transfer_param_to_model(global_net.get_params())
             (loss_i, local_param_i) = local_nets[i].train()
             local_params.append(local_param_i)
             local_losses.append(loss_i)
-            local_validation_accuracies.append(local_nets[i].get_validation_accuracy())
-            local_accuracies.append(local_nets[i].get_accuracy())
 
         global_param = global_net.aggregate_central(local_params)
+        
+        for i in range(N_partitions): 
+            local_nets[i].transfer_param_to_model(global_net.get_params())
+            local_validation_accuracies.append(local_nets[i].get_validation_accuracy())
+            local_accuracies.append(local_nets[i].get_accuracy())
 
         avg_local_loss = sum(local_losses) / len(local_losses)
         avg_local_validation_accuracy = sum(local_validation_accuracies) / len(local_validation_accuracies)
