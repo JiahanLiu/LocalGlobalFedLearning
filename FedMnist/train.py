@@ -166,7 +166,7 @@ def main():
     stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
     get_unified_train_loader = data_loader.get_unified_train_loader_closure(C2R3_BATCH_SIZE)
-    central_learning(nn_architectures.NetCNN_conv2_relu3, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_epoch_saturation, C2R3_LEARNING_RATE)
+    central_learning(nn_architectures.NetCNN_convrelu3_relu3, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_epoch_saturation, C2R3_LEARNING_RATE)
     
     # get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(FC_BATCH_SIZE)
     # fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_random_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
