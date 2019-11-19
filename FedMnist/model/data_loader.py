@@ -179,5 +179,4 @@ def get_semibalanced_partitioned_test_loaders_closure(percentage_balanced):
         test_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=len(dataset), shuffle=False) for dataset in paritioned_test_sets]
 
         return test_loaders
-    
     return get_semibalanced_partitioned_test_loaders
