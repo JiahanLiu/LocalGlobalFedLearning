@@ -21,6 +21,8 @@ C2R3_LEARNING_RATE = 0
 
 FED_NETFC1_TEST_BALANCED_FILE = ""
 FED_NETFC1_TEST_UNBALANCED_FILE = ""
+FED_NETC2R3_TEST_BALANCED_FILE = ""
+FED_NETC2R3_TEST_UNBALANCED_FILE = ""
 
 def init():
     global N_PARTITIONS
@@ -35,6 +37,8 @@ def init():
 
     global FED_NETFC1_TEST_BALANCED_FILE
     global FED_NETFC1_TEST_UNBALANCED_FILE
+    global FED_NETC2R3_TEST_BALANCED_FILE
+    global FED_NETC2R3_TEST_UNBALANCED_FILE
     with open('config.json') as config_file:
         config = json.load(config_file)
         N_PARTITIONS = int(config['machine_learning']['N_PARTITIONS'])
@@ -49,6 +53,9 @@ def init():
 
         FED_NETFC1_TEST_BALANCED_FILE = config['results']['FED_NETFC1_TEST_BALANCED_FILE']
         FED_NETFC1_TEST_UNBALANCED_FILE = config['results']['FED_NETFC1_TEST_UNBALANCED_FILE']
+        FED_NETC2R3_TEST_BALANCED_FILE = config['results']['FED_NETC2R3_TEST_BALANCED_FILE']
+        FED_NETC2R3_TEST_UNBALANCED_FILE = config['results']['FED_NETC2R3_TEST_UNBALANCED_FILE']
+
 
 def write_results(file_path, balance_percentage, loss, validation_accuracy, accuracy):
     if False == os.path.isfile(file_path):
