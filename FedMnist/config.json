@@ -1,11 +1,18 @@
 {
     "machine_learning": {
         "N_PARTITIONS": 3,
-        "N_EPOCHS": 36, 
         "EPOCH_SATURATION": 20, 
         "MAX_EPOCHS": 100,
-        "BATCH_SIZE": 128,
-        "FC_LEARNING_RATE": 0.00239,
+        "NetFC_1": {
+            "FC_N_EPOCHS": 36, 
+            "FC_BATCH_SIZE": 128,
+            "FC_LEARNING_RATE": 0.00239
+        },
+        "NetCNN_conv2_relu3": {
+            "C2R3_N_EPOCHS": 36, 
+            "C2R3_BATCH_SIZE": 128,
+            "C2R3_LEARNING_RATE": 0.00239
+        }, 
         "DATA_PARALLEL": false
     },
     "hyperparameter_search" : {
@@ -13,7 +20,9 @@
     },
     "results" : {
         "FED_NETFC1_TEST_BALANCED_FILE": "results/fed_NetFC1_test_balanced.csv",
-        "FED_NETFC1_TEST_UNBALANCED_FILE": "results/fed_NetFC1_test_unbalanced.csv"
+        "FED_NETFC1_TEST_UNBALANCED_FILE": "results/fed_NetFC1_test_unbalanced.csv",
+        "FED_NETC2R3_TEST_BALANCED_FILE": "results/fed_NetC2R3_test_balanced.csv",
+        "FED_NETC2R3_TEST_UNBALANCED_FILE": "results/fed_NetC2R3_test_unbalanced.csv"
     },
     "networking": {
         "SERVER_URL_BASE": "http://167.71.247.3:3000/",

@@ -109,9 +109,9 @@ def main():
         DOWNLOAD_URL = SERVER_URL_BASE + config['networking']['DOWNLOAD_ROUTE']
         QUERY_GLOBAL_SYNC_DONE_URL = SERVER_URL_BASE + config['networking']['QUERY_GLOBAL_SYNC_DONE_ROUTE']
         QUERY_FED_AVG_DONE_URL = SERVER_URL_BASE + config['networking']['QUERY_FED_AVG_DONE_ROUTE']
-        N_EPOCHS = int(config['machine_learning']['N_EPOCHS'])
+        FC_N_EPOCHS = int(config['machine_learning']['NetFC_1']['FC_N_EPOCHS'])
 
-    federated_local(nn_architectures.NetFC_1, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_EPOCHS, node_n)
+    federated_local(nn_architectures.NetFC_1, data_loader.get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, FC_N_EPOCHS, node_n)
 
 if __name__ == "__main__":
     main()

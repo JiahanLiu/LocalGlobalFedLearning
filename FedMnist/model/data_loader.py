@@ -4,7 +4,6 @@ from torchvision import datasets, transforms
 import math
 import os
 
-BATCH_SIZE_TRAIN = 256
 VALIDATION_SIZE = 10000
 
 DIRPATH = os.getcwd()
@@ -81,12 +80,10 @@ def get_unified_train_loader_closure(batch_size):
 
         index = 0
         index = fill_set_straight(train_dataset, validation_set, VALIDATION_SIZE, index)
-        print("Here: " + str(index))
         for j in range(partition_size):
             item = train_dataset.__getitem__(index)
             index = index + 1
             train_set.__add__(item)
-        print("Here: " + str(index))
 
         train_loader = torch.utils.data.DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True)
         validation_loader = torch.utils.data.DataLoader(dataset=validation_set, batch_size=VALIDATION_SIZE, shuffle=False)
