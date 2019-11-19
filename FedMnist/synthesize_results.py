@@ -99,8 +99,8 @@ def synthesize_NETFC1_test_unbalanced(N_averaged, resolution):
 def main(): 
     init()
 
-    synthesize_NETFC1_test_balanced(N_averaged=1, resolution=1)
-    synthesize_NETFC1_test_unbalanced(N_averaged=1, resolution=1)
+    synthesize_NETFC1_test_balanced(N_averaged=3, resolution=20)
+    synthesize_NETFC1_test_unbalanced(N_averaged=3, resolution=20)
 
 if __name__ == "__main__":
     main()
