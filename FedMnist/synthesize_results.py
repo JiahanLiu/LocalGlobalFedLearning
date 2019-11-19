@@ -3,9 +3,11 @@ from model import nn_architectures, data_loader
 import train
 
 import csv
+import getopt
 import json
 import matplotlib.pyplot as plt
 import os
+import sys
 
 N_PARTITIONS = 0
 N_EPOCHS = 0
@@ -96,10 +98,23 @@ def synthesize_NETFC1_test_unbalanced(N_averaged, resolution):
         write_results(FED_NETFC1_TEST_UNBALANCED_FILE, balance_percentage, opt_loss.item(), opt_val_acc, opt_acc)
 
 def main(): 
+    gpn_n = -1
+    options, remainder = getopt.getopt(sys.argv[1:], 'g:')
+    for opt, arg in options:
+        if opt in ('-g'):
+            gpu_n = arg
+
     init()
 
-    synthesize_NETFC1_test_balanced(N_averaged=1, resolution=50)
-    synthesize_NETFC1_test_unbalanced(N_averaged=1, resolution=50)
+    if(-1 == gpu_n):
+        synthesize_NETFC1_test_balanced(N_averaged=1, resolution=50)
+        synthesize_NETFC1_test_unbalanced(N_averaged=1, resolution=50)
+    elif (0 == gpn_n):
+        federated.set_device("cuda:" + str(gpu_n))
+        synthesize_NETFC1_test_balanced(N_averaged=1, resolution=50)
+    elif (1 == gpn_n):
+        federated.set_device("cuda:" + str(gpu_n))
+        synthesize_NETFC1_test_unbalanced(N_averaged=1, resolution=50)
 
 if __name__ == "__main__":
     main()
