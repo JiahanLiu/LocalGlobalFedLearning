@@ -24,8 +24,7 @@ def init():
     with open('config.json') as config_file:
         config = json.load(config_file)
         N_PARTITIONS = int(config['machine_learning']['N_PARTITIONS'])
-        # N_EPOCHS = int(config['machine_learning']['N_EPOCHS'])
-        N_EPOCHS = 1
+        N_EPOCHS = int(config['machine_learning']['N_EPOCHS'])
         BATCH_SIZE = int(config['machine_learning']['BATCH_SIZE'])
         FC_LEARNING_RATE = float(config['machine_learning']['FC_LEARNING_RATE'])
 

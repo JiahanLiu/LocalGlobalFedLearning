@@ -158,26 +158,18 @@ def main():
     stop_at_N_epochs = stop_at_N_epochs_closure(N_EPOCHS)
     stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
-    # RESOLUTION = 2
-    # results_array = []
-    # results_array.append(['Semi-Balanced Percentage', 'Accuracy', 'Loss'])
-    # for i in range(RESOLUTION+1):
-    #     balanced_percentage =  (100 / RESOLUTION) * i
-    #     get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balanced_percentage, BATCH_SIZE)   
-    #     (accuracy, loss, N_epochs) = fed_learning(nn_architectures.NetFC_1, get_semibalanced_partitioned_train_loader, data_loader.get_unified_test_loader, N_partitions, stop_at_epoch_saturation, FC_LEARNING_RATE) 
-    #     results_array.append([balanced_percentage, accuracy, loss])
+    balance_percentage = 0
 
-    # results_path = 'results/demo_results.csv'
-    # with open(results_path, mode='w') as csv_file:
-    #     writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    #     for row in results_array:
-    #         writer.writerow(row)
+    get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, BATCH_SIZE)   
+    get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
+    optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = fed_learning(nn_architectures.NetFC_1, get_semibalanced_partitioned_train_loader, 
+        get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
 
     # get_unified_train_loader = data_loader.get_unified_train_loader_closure(BATCH_SIZE)
     # central_learning(nn_architectures.NetFC_1, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_epoch_saturation, FC_LEARNING_RATE)
     
-    get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(BATCH_SIZE)
-    fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_random_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
+    # get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(BATCH_SIZE)
+    # fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_random_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
     # local_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_unified_test_loader, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
     
     # get_unbalanced_partitioned_train_loaders = data_loader.get_unbalanced_partitioned_train_loaders_closure(BATCH_SIZE)
