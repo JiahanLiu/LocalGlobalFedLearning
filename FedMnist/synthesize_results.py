@@ -113,7 +113,6 @@ def main():
         federated.set_device("cuda:" + str(gpu_n))
         synthesize_NETFC1_test_balanced(N_averaged=1, resolution=50)
     elif (1 == gpu_n):
-        print("here")
         federated.set_device("cuda:" + str(gpu_n))
         synthesize_NETFC1_test_unbalanced(N_averaged=1, resolution=50)
     else:
