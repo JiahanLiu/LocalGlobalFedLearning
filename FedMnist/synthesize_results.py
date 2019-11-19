@@ -171,6 +171,18 @@ def main():
         synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETC2R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
             C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
         synthesize_unbalanced(N_averaged, resolution=50)
+
+    elif (4 == gpu_n):
+        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
+        synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+            CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)
+        synthesize_unbalanced(N_averaged, resolution=50)
+
+    elif (5 == gpu_n):
+        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
+        synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+            CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)
+        synthesize_unbalanced(N_averaged, resolution=50)
     else:
         print("Invalid Arg: " + str(gpu_n))
 
