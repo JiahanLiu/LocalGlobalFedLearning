@@ -2,6 +2,8 @@ import federated
 from model import nn_architectures, data_loader
 import train
 
+import torch
+
 import csv
 import getopt
 import json
@@ -131,7 +133,7 @@ def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH
 
             write_results(FILEPATH, balance_percentage, opt_loss.item(), opt_val_acc, opt_acc)
         
-        return synthesize_NETFC1_test_unbalanced
+    return synthesize_unbalanced
 
 def main(): 
     gpu_n = -1
