@@ -180,9 +180,9 @@ def main():
 
     elif (5 == gpu_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+        synthesize_balanced = synthesize_balanced_closure(FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
             CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)
-        synthesize_unbalanced(N_averaged, resolution=50)
+        synthesize_balanced(N_averaged, resolution=50)
     else:
         print("Invalid Arg: " + str(gpu_n))
 
