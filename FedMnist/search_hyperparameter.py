@@ -123,7 +123,8 @@ def main():
 
     if (0 == gpu_n):
         print("Hyper search GPU 0")
-        search_fed_model(n_iterations, gpu_n%torch.cuda.device_count(), N_averaged, nn_architectures.NetFC_1, FED_NETFC1_BALANCED100_FILE)
+        # search_fed_model(n_iterations, gpu_n%torch.cuda.device_count(), N_averaged, nn_architectures.NetFC_1, FED_NETFC1_BALANCED100_FILE)
+        search_fed_model(n_iterations, gpu_n%torch.cuda.device_count(), N_averaged, nn_architectures.NetCNN_convrelu3_relu3, FED_NETCR3R3_BALANCED100_FILE)
 
     elif (1 == gpu_n):
         print("Hyper search GPU 1")
