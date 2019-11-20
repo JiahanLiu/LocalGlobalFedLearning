@@ -91,7 +91,7 @@ def write_results(file_path, optimal_epoch, batch_size, learning_rate, opt_loss,
         writer.writerow(result_row)
         fcntl.flock(f, fcntl.LOCK_UN) 
 
-def pull_top_results(file_path, batch_size):
+def pull_top_results(file_path):
     opt_20_list = []
     with open(file_path, 'r') as f:
         readCSV = csv.reader(f)

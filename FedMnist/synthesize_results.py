@@ -144,7 +144,7 @@ def main():
 
     init()
 
-    N_averaged = 1
+    N_averaged = 3
 
     if(-1 == gpu_n):
         print("Add Arg for GPU number or Re-write code to do on CPU")

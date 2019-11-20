@@ -4,19 +4,19 @@
         "EPOCH_SATURATION": 20, 
         "MAX_EPOCHS": 100,
         "NetFC_1": {
-            "FC_N_EPOCHS": 36, 
+            "FC_N_EPOCHS": 21, 
             "FC_BATCH_SIZE": 128,
-            "FC_LEARNING_RATE": 0.00239
+            "FC_LEARNING_RATE": 0.003917778660435235
         },
         "NetCNN_conv2_relu3": {
-            "C2R3_N_EPOCHS": 36, 
-            "C2R3_BATCH_SIZE": 128,
-            "C2R3_LEARNING_RATE": 0.00239
+            "C2R3_N_EPOCHS": 83, 
+            "C2R3_BATCH_SIZE": 512,
+            "C2R3_LEARNING_RATE": 0.002314201049657718
         },
         "NetCNN_convrelu3_relu3": {
-            "CR3R3_N_EPOCHS": 36, 
+            "CR3R3_N_EPOCHS": 74, 
             "CR3R3_BATCH_SIZE": 128,
-            "CR3R3_LEARNING_RATE": 0.00239
+            "CR3R3_LEARNING_RATE": 0.00500796445124362
         },  
         "DATA_PARALLEL": false
     },
