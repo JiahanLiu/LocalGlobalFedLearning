@@ -91,7 +91,7 @@ def write_results(file_path, optimal_epoch, batch_size, learning_rate, opt_loss,
         writer.writerow(result_row)
         fcntl.flock(f, fcntl.LOCK_UN) 
 
-def pull_top_results(file_path):
+def pull_top_results(file_path, batch_size):
     opt_20_list = []
     with open(file_path, 'r') as f:
         readCSV = csv.reader(f)
@@ -102,8 +102,8 @@ def pull_top_results(file_path):
                 opt_20_list.append([float(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])])
             else:
                 opt_20_list.sort(key = lambda x: x[4], reverse=True)
-                if (opt_20_list[19][4] < float(row[4])) and (float(row[1]) == 128):
-                    opt_20_list[19] = [float(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])]
+                # if (opt_20_list[19][4] < float(row[4])) and (float(row[1]) == 128):
+                opt_20_list[19] = [float(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])]
     
     for row in opt_20_list:
         print_results(str(row[0]), str(row[1]), str(row[2]), str(row[3]), str(row[4]), str(row[5]))
