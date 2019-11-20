@@ -3,5 +3,6 @@ do
     python3 search_hyperparameter.py -g 0 &
     python3 search_hyperparameter.py -g 1 & 
     python3 search_hyperparameter.py -g 2 & 
+    python3 search_hyperparameter.py -g 3 & 
 done
 

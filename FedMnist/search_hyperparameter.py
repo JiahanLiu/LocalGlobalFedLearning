@@ -133,6 +133,10 @@ def main():
         print("Hyper search GPU 2")
         search_fed_model(n_iterations, gpu_n%torch.cuda.device_count(), N_averaged, nn_architectures.NetCNN_convrelu3_relu3, FED_NETCR3R3_BALANCED100_FILE)
     
+     elif (3 == gpu_n):
+        print("Hyper search GPU 3")
+        search_fed_model(n_iterations, gpu_n%torch.cuda.device_count(), N_averaged, nn_architectures.NetCNN_convrelu3_relu3, FED_NETCR3R3_BALANCED100_FILE)
+
     elif (-1 == gpu_n):
         print("Top 20 Results: NetFC1")
         pull_top_results(FED_NETFC1_BALANCED100_FILE)
