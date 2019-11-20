@@ -1,8 +1,7 @@
-for((c=0; c <8; c++))
+for((c=0; c <2; c++))
 do
-    time (python3 search_hyperparameter.py -g 0 > /dev/null) & 
-    time (python3 search_hyperparameter.py -g 1 > /dev/null) & 
-    time (python3 search_hyperparameter.py -g 2 > /dev/null) & 
-    time (python3 search_hyperparameter.py -g 3 > /dev/null) & 
+    python3 search_hyperparameter.py -g 0 &
+    python3 search_hyperparameter.py -g 1 & 
+    python3 search_hyperparameter.py -g 2 & 
 done
 

@@ -21,7 +21,9 @@
         "DATA_PARALLEL": false
     },
     "hyperparameter_search" : {
-        "FED_NETFC1_BALANCED100_FILE": "hyperparameter_search/fed_NetFC1_balance100.csv"
+        "FED_NETFC1_BALANCED100_FILE": "hyperparameter_search/fed_NetFC1_balance100.csv",
+        "FED_NETC2R3_BALANCED100_FILE": "hyperparameter_search/fed_NetC2R3_balance100.csv",
+        "FED_NETCR3R3_BALANCED100_FILE": "hyperparameter_search/fed_NetCR3R3_balance100.csv"
     },
     "results" : {
         "FED_NETFC1_TEST_BALANCED_FILE": "results/fed_NetFC1_test_balanced.csv",
