@@ -31,7 +31,13 @@
         "FED_NETC2R3_TEST_BALANCED_FILE": "results/fed_NetC2R3_test_balanced.csv",
         "FED_NETC2R3_TEST_UNBALANCED_FILE": "results/fed_NetC2R3_test_unbalanced.csv",
         "FED_NETCR3R3_TEST_BALANCED_FILE": "results/fed_NetCR3R3_test_balanced.csv",
-        "FED_NETCR3R3_TEST_UNBALANCED_FILE": "results/fed_NetCR3R3_test_unbalanced.csv"
+        "FED_NETCR3R3_TEST_UNBALANCED_FILE": "results/fed_NetCR3R3_test_unbalanced.csv",
+        "LOCAL_NETFC1_TEST_BALANCED_FILE": "results/local_NetFC1_test_balanced.csv",
+        "LOCAL_NETFC1_TEST_UNBALANCED_FILE": "results/local_NetFC1_test_unbalanced.csv",
+        "LOCAL_NETC2R3_TEST_BALANCED_FILE": "results/local_NetC2R3_test_balanced.csv",
+        "LOCAL_NETC2R3_TEST_UNBALANCED_FILE": "results/local_NetC2R3_test_unbalanced.csv",
+        "LOCAL_NETCR3R3_TEST_BALANCED_FILE": "results/local_NetCR3R3_test_balanced.csv",
+        "LOCAL_NETCR3R3_TEST_UNBALANCED_FILE": "results/local_NetCR3R3_test_unbalanced.csv"
     },
     "networking": {
         "SERVER_URL_BASE": "http://167.71.247.3:3000/",

@@ -29,6 +29,12 @@ FED_NETC2R3_TEST_BALANCED_FILE = ""
 FED_NETC2R3_TEST_UNBALANCED_FILE = ""
 FED_NETCR3R3_TEST_BALANCED_FILE = ""
 FED_NETCR3R3_TEST_UNBALANCED_FILE = ""
+LOCAL_NETFC1_TEST_BALANCED_FILE = ""
+LOCAL_NETFC1_TEST_UNBALANCED_FILE = ""
+LOCAL_NETC2R3_TEST_BALANCED_FILE = ""
+LOCAL_NETC2R3_TEST_UNBALANCED_FILE = ""
+LOCAL_NETCR3R3_TEST_BALANCED_FILE = ""
+LOCAL_NETCR3R3_TEST_UNBALANCED_FILE = ""
 
 def init():
     global N_PARTITIONS
@@ -49,6 +55,12 @@ def init():
     global FED_NETC2R3_TEST_UNBALANCED_FILE
     global FED_NETCR3R3_TEST_BALANCED_FILE
     global FED_NETCR3R3_TEST_UNBALANCED_FILE
+    global LOCAL_NETFC1_TEST_BALANCED_FILE
+    global LOCAL_NETFC1_TEST_UNBALANCED_FILE
+    global LOCAL_NETC2R3_TEST_BALANCED_FILE 
+    global LOCAL_NETC2R3_TEST_UNBALANCED_FILE
+    global LOCAL_NETCR3R3_TEST_BALANCED_FILE 
+    global LOCAL_NETCR3R3_TEST_UNBALANCED_FILE
 
     with open('config.json') as config_file:
         config = json.load(config_file)
@@ -70,6 +82,12 @@ def init():
         FED_NETC2R3_TEST_UNBALANCED_FILE = config['results']['FED_NETC2R3_TEST_UNBALANCED_FILE']
         FED_NETCR3R3_TEST_BALANCED_FILE = config['results']['FED_NETCR3R3_TEST_BALANCED_FILE']
         FED_NETCR3R3_TEST_UNBALANCED_FILE = config['results']['FED_NETCR3R3_TEST_UNBALANCED_FILE']
+        LOCAL_NETFC1_TEST_BALANCED_FILE = config['results']['LOCAL_NETFC1_TEST_BALANCED_FILE']
+        LOCAL_NETFC1_TEST_UNBALANCED_FILE = config['results']['LOCAL_NETFC1_TEST_UNBALANCED_FILE']
+        LOCAL_NETC2R3_TEST_BALANCED_FILE = config['results']['LOCAL_NETC2R3_TEST_BALANCED_FILE']
+        LOCAL_NETC2R3_TEST_UNBALANCED_FILE = config['results']['LOCAL_NETC2R3_TEST_UNBALANCED_FILE']
+        LOCAL_NETCR3R3_TEST_BALANCED_FILE = config['results']['LOCAL_NETCR3R3_TEST_BALANCED_FILE']
+        LOCAL_NETCR3R3_TEST_UNBALANCED_FILE = config['results']['LOCAL_NETCR3R3_TEST_UNBALANCED_FILE']
 
 def write_results(file_path, balance_percentage, loss, validation_accuracy, accuracy):
     if False == os.path.isfile(file_path):
@@ -83,7 +101,7 @@ def write_results(file_path, balance_percentage, loss, validation_accuracy, accu
         writer = csv.writer(f)
         writer.writerow(result_row)
 
-def synthesize_balanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_SIZE, LEARNING_RATE):
+def synthesize_balanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_SIZE, LEARNING_RATE, learning_type):
     def synthesize_balanced(N_averaged, resolution, start_res):
         global N_PARTITIONS
 
@@ -99,7 +117,7 @@ def synthesize_balanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_S
             for j in range (N_averaged):
                 get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, BATCH_SIZE)   
                 get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(100)
-                optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = train.fed_learning(NetworkArchitecture, get_semibalanced_partitioned_train_loader, 
+                optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = learning_type(NetworkArchitecture, get_semibalanced_partitioned_train_loader, 
                     get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, LEARNING_RATE)
                 
                 opt_loss = opt_loss + opt_loss_i/N_averaged
@@ -110,7 +128,7 @@ def synthesize_balanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_S
     
     return synthesize_balanced
 
-def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_SIZE, LEARNING_RATE):
+def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_SIZE, LEARNING_RATE, learning_type):
     def synthesize_unbalanced(N_averaged, resolution, start_res):
         global N_PARTITIONS
 
@@ -125,7 +143,7 @@ def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH
             for j in range (N_averaged):
                 get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, BATCH_SIZE)   
                 get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
-                optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = train.fed_learning(NetworkArchitecture, get_semibalanced_partitioned_train_loader, 
+                optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = learning_type(NetworkArchitecture, get_semibalanced_partitioned_train_loader, 
                     get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, LEARNING_RATE)
                 
                 opt_loss = opt_loss + opt_loss_i/N_averaged
@@ -137,6 +155,8 @@ def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH
     return synthesize_unbalanced
 
 def main(): 
+    global N_PARTITIONS
+
     prog_n = -1
     gpu_n = -1
     start_res = -1
@@ -155,45 +175,82 @@ def main():
     init()
 
     N_averaged = 1
-    resolution = 50
+    resolution = 20
 
+    federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
     if(-1 == prog_n):
         print("Add Arg for GPU number or Re-write code to do on CPU")
     elif (0 == prog_n):
-        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_balanced = synthesize_balanced_closure(FED_NETFC1_TEST_BALANCED_FILE, nn_architectures.NetFC_1, 
-            FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE)
+        if(0 == locality):
+            print("Central TODO")
+        elif (1 == locality):
+            synthesize_balanced = synthesize_balanced_closure(FED_NETFC1_TEST_BALANCED_FILE, nn_architectures.NetFC_1, 
+                FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE, train.fed_learning)
+        else:
+            synthesize_balanced = synthesize_balanced_closure(LOCAL_NETFC1_TEST_BALANCED_FILE, nn_architectures.NetFC_1, 
+                FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE, train.local_learning)
+        
         synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (1 == prog_n):
-        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETFC1_TEST_UNBALANCED_FILE, nn_architectures.NetFC_1, 
-            FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE)
-        synthesize_unbalanced(N_averaged, resolution, start_res)
+        if(0 == locality):
+            print("Central TODO")
+        elif (1 == locality):
+            synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETFC1_TEST_UNBALANCED_FILE, nn_architectures.NetFC_1, 
+                FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE, train.fed_learning)
+        else:
+            synthesize_balanced = synthesize_balanced_closure(LOCAL_NETFC1_TEST_UNBALANCED_FILE, nn_architectures.NetFC_1, 
+                FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE, train.local_learning)
+        
+        synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (2 == prog_n):
-        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_balanced = synthesize_balanced_closure(FED_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
-            C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
+        if(0 == locality):
+            print("Central TODO")
+        elif (1 == locality):
+            synthesize_balanced = synthesize_balanced_closure(FED_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
+                C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.fed_learning)
+        else:
+            synthesize_balanced = synthesize_balanced_closure(LOCAL_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
+                C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.local_learning)
+        
         synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (3 == prog_n):
-        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETC2R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
-            C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
-        synthesize_unbalanced(N_averaged, resolution, start_res)
+        if(0 == locality):
+            print("Central TODO")
+        elif (1 == locality):
+            synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETC2R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
+                C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.fed_learning)
+        else:
+            synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETC2R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
+                C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.local_learning)
+        
+        synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (4 == prog_n):
-        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_balanced = synthesize_balanced_closure(FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
-            CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)
+        if(0 == locality):
+            print("Central TODO")
+        elif (1 == locality):
+            synthesize_balanced = synthesize_balanced_closure(FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+                CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.fed_learning)
+        else:
+            synthesize_balanced = synthesize_balanced_closure(FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+                CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.local_learning)
+        
         synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (5 == prog_n):
-        federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
-        synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
-            CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)
-        synthesize_unbalanced(N_averaged, resolution, start_res)
+        if(0 == locality):
+            print("Central TODO")
+        elif (1 == locality):
+            synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+                CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.fed_learning)
+        else:
+            synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+                CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.local_learning)
+        
+        synthesize_balanced(N_averaged, resolution, start_res)
 
     else:
         print("Invalid Arg: " + str(gpu_n))
