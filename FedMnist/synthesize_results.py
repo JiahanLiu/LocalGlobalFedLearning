@@ -95,7 +95,7 @@ def synthesize_balanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_S
             opt_loss = 0
             opt_val_acc = 0
             opt_acc = 0
-            for i in range (N_averaged):
+            for j in range (N_averaged):
                 get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, BATCH_SIZE)   
                 get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(100)
                 optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = train.fed_learning(NetworkArchitecture, get_semibalanced_partitioned_train_loader, 
@@ -121,7 +121,7 @@ def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH
             opt_loss = 0
             opt_val_acc = 0
             opt_acc = 0
-            for i in range (N_averaged):
+            for j in range (N_averaged):
                 get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, BATCH_SIZE)   
                 get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
                 optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = train.fed_learning(NetworkArchitecture, get_semibalanced_partitioned_train_loader, 
@@ -146,7 +146,7 @@ def main():
 
     N_averaged = 3
     resolution = 50
-    start_res = 11
+    start_res = 12
 
     if(-1 == gpu_n):
         print("Add Arg for GPU number or Re-write code to do on CPU")
