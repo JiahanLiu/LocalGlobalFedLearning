@@ -35,6 +35,9 @@ LOCAL_NETC2R3_TEST_BALANCED_FILE = ""
 LOCAL_NETC2R3_TEST_UNBALANCED_FILE = ""
 LOCAL_NETCR3R3_TEST_BALANCED_FILE = ""
 LOCAL_NETCR3R3_TEST_UNBALANCED_FILE = ""
+CENTRAL_NETFC1_TEST_BALANCED_FILE = ""
+CENTRAL_NETC2R3_TEST_BALANCED_FILE = ""
+CENTRAL_NETCR3R3_TEST_BALANCED_FILE = ""
 
 def init():
     global N_PARTITIONS
@@ -61,6 +64,9 @@ def init():
     global LOCAL_NETC2R3_TEST_UNBALANCED_FILE
     global LOCAL_NETCR3R3_TEST_BALANCED_FILE 
     global LOCAL_NETCR3R3_TEST_UNBALANCED_FILE
+    global CENTRAL_NETFC1_TEST_BALANCED_FILE
+    global CENTRAL_NETC2R3_TEST_BALANCED_FILE
+    global CENTRAL_NETCR3R3_TEST_BALANCED_FILE
 
     with open('config.json') as config_file:
         config = json.load(config_file)
@@ -88,6 +94,9 @@ def init():
         LOCAL_NETC2R3_TEST_UNBALANCED_FILE = config['results']['LOCAL_NETC2R3_TEST_UNBALANCED_FILE']
         LOCAL_NETCR3R3_TEST_BALANCED_FILE = config['results']['LOCAL_NETCR3R3_TEST_BALANCED_FILE']
         LOCAL_NETCR3R3_TEST_UNBALANCED_FILE = config['results']['LOCAL_NETCR3R3_TEST_UNBALANCED_FILE']
+        CENTRAL_NETFC1_TEST_BALANCED_FILE = config['results']['CENTRAL_NETFC1_TEST_BALANCED_FILE']
+        CENTRAL_NETC2R3_TEST_BALANCED_FILE = config['results']['CENTRAL_NETC2R3_TEST_BALANCED_FILE']
+        CENTRAL_NETCR3R3_TEST_BALANCED_FILE = config['results']['CENTRAL_NETCR3R3_TEST_BALANCED_FILE']
 
 def write_results(file_path, balance_percentage, loss, validation_accuracy, accuracy):
     if False == os.path.isfile(file_path):
@@ -181,9 +190,7 @@ def main():
     if(-1 == prog_n):
         print("Add Arg for GPU number or Re-write code to do on CPU")
     elif (0 == prog_n):
-        if(0 == locality):
-            print("Central TODO")
-        elif (1 == locality):
+        if (1 == locality):
             synthesize_balanced = synthesize_balanced_closure(FED_NETFC1_TEST_BALANCED_FILE, nn_architectures.NetFC_1, 
                 FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE, train.fed_learning)
         else:
@@ -193,9 +200,7 @@ def main():
         synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (1 == prog_n):
-        if(0 == locality):
-            print("Central TODO")
-        elif (1 == locality):
+        if (1 == locality):
             synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETFC1_TEST_UNBALANCED_FILE, nn_architectures.NetFC_1, 
                 FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE, train.fed_learning)
         else:
@@ -217,9 +222,7 @@ def main():
         synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (3 == prog_n):
-        if(0 == locality):
-            print("Central TODO")
-        elif (1 == locality):
+        if (1 == locality):
             synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETC2R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
                 C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.fed_learning)
         else:
@@ -229,9 +232,7 @@ def main():
         synthesize_unbalanced(N_averaged, resolution, start_res)
 
     elif (4 == prog_n):
-        if(0 == locality):
-            print("Central TODO")
-        elif (1 == locality):
+        if (1 == locality):
             synthesize_balanced = synthesize_balanced_closure(FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
                 CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.fed_learning)
         else:
@@ -241,9 +242,7 @@ def main():
         synthesize_balanced(N_averaged, resolution, start_res)
 
     elif (5 == prog_n):
-        if(0 == locality):
-            print("Central TODO")
-        elif (1 == locality):
+        if (1 == locality):
             synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
                 CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.fed_learning)
         else:
