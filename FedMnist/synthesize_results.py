@@ -136,33 +136,38 @@ def synthesize_unbalanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH
     return synthesize_unbalanced
 
 def main(): 
+    prog_n = -1
     gpu_n = -1
-    options, remainder = getopt.getopt(sys.argv[1:], 'g:')
+    start_res = -1
+    options, remainder = getopt.getopt(sys.argv[1:], 'p:g:s:')
     for opt, arg in options:
+        if opt in ('-p'):
+            prog_n = int(arg)
         if opt in ('-g'):
             gpu_n = int(arg)
+        if opt in ('-s'):
+            start_res = int(arg)
 
     init()
 
     N_averaged = 3
     resolution = 50
-    start_res = 12
 
-    if(-1 == gpu_n):
+    if(-1 == prog_n):
         print("Add Arg for GPU number or Re-write code to do on CPU")
-    elif (0 == gpu_n):
+    elif (0 == prog_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
         synthesize_balanced = synthesize_balanced_closure(FED_NETFC1_TEST_BALANCED_FILE, nn_architectures.NetFC_1, 
             FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE)
         synthesize_balanced(N_averaged, resolution, start_res)
 
-    elif (1 == gpu_n):
+    elif (1 == prog_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
         synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETFC1_TEST_UNBALANCED_FILE, nn_architectures.NetFC_1, 
             FC_N_EPOCHS, FC_BATCH_SIZE, FC_LEARNING_RATE)
         synthesize_unbalanced(N_averaged, resolution, start_res)
 
-    elif (2 == gpu_n):
+    elif (2 == prog_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
         synthesize_balanced = synthesize_balanced_closure(FED_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
             C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
@@ -174,13 +179,13 @@ def main():
             C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
         synthesize_unbalanced(N_averaged, resolution, start_res)
 
-    elif (4 == gpu_n):
+    elif (4 == prog_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
         synthesize_balanced = synthesize_balanced_closure(FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
             CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)
         synthesize_balanced(N_averaged, resolution, start_res)
 
-    elif (5 == gpu_n):
+    elif (5 == prog_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
         synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
             CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE)

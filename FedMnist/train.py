@@ -167,9 +167,9 @@ def main():
         CR3R3_BATCH_SIZE = int(config['machine_learning']['NetCNN_convrelu3_relu3']['CR3R3_N_EPOCHS'])
         CR3R3_LEARNING_RATE = float(config['machine_learning']['NetCNN_convrelu3_relu3']['CR3R3_LEARNING_RATE'])
     
-    federated.set_device("cuda:2")
+    federated.set_device("cuda:0")
 
-    stop_at_N_epochs = stop_at_N_epochs_closure(CR3R3_N_EPOCHS)
+    stop_at_N_epochs = stop_at_N_epochs_closure(C2R3_N_EPOCHS)
     stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
     # get_unified_train_loader = data_loader.get_unified_train_loader_closure(CR3R3_BATCH_SIZE)
@@ -185,10 +185,10 @@ def main():
     # local_learning(nn_architectures.NetFC_1, get_unbalanced_partitioned_train_loaders, data_loader.get_unbalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
 
     balance_percentage = 0
-    get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, CR3R3_BATCH_SIZE)   
+    get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, C2R3_BATCH_SIZE)   
     get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
-    optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = fed_learning(nn_architectures.NetCNN_convrelu3_relu3, get_semibalanced_partitioned_train_loader, 
-        get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, CR3R3_LEARNING_RATE)
+    optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = fed_learning(nn_architectures.NetCNN_conv2_relu3, get_semibalanced_partitioned_train_loader, 
+        get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, C2R3_LEARNING_RATE)
 
 if __name__ == "__main__":
     main()
