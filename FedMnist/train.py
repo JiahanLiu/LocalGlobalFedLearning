@@ -20,7 +20,7 @@ def print_results(epoch_n, loss, validation_accuracy, acc):
     if DEBUG:
         print("Epoch: " + epoch_n + " | Loss: " + loss + " | ValAcc: " + validation_accuracy + " | Acc: " + acc)
 
-def central_learning(network_architecture, get_train_loader, get_test_loader, end_function, learning_rate):
+def central_learning(network_architecture, get_train_loader, get_test_loader, N_partitions, end_function, learning_rate):
     net = federated.Local_Model(network_architecture, get_train_loader, get_test_loader, N_partitions=0, node_id=0, learning_rate=learning_rate)
 
     end_condition = False

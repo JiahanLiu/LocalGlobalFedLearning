@@ -175,7 +175,7 @@ def main():
     init()
 
     N_averaged = 1
-    resolution = 20
+    resolution = 50
 
     federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
     if(-1 == prog_n):
