@@ -90,6 +90,7 @@ def synthesize_balanced_closure(FILEPATH, NetworkArchitecture, N_EPOCHS, BATCH_S
         stop_at_N_epochs = train.stop_at_N_epochs_closure(N_EPOCHS)
 
         for i in range(start_res, resolution+1):
+
             balance_percentage = i * 100/resolution
 
             opt_loss = 0
@@ -150,7 +151,7 @@ def main():
 
     init()
 
-    N_averaged = 3
+    N_averaged = 1
     resolution = 50
 
     if(-1 == prog_n):
@@ -173,7 +174,7 @@ def main():
             C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
         synthesize_balanced(N_averaged, resolution, start_res)
 
-    elif (3 == gpu_n):
+    elif (3 == prog_n):
         federated.set_device("cuda:" + str(gpu_n%torch.cuda.device_count()))
         synthesize_unbalanced = synthesize_unbalanced_closure(FED_NETC2R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
             C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE)
