@@ -140,7 +140,8 @@ def main():
     prog_n = -1
     gpu_n = -1
     start_res = -1
-    options, remainder = getopt.getopt(sys.argv[1:], 'p:g:s:')
+    locality = -1
+    options, remainder = getopt.getopt(sys.argv[1:], 'p:g:s:l:')
     for opt, arg in options:
         if opt in ('-p'):
             prog_n = int(arg)
@@ -148,6 +149,8 @@ def main():
             gpu_n = int(arg)
         if opt in ('-s'):
             start_res = int(arg)
+        if opt in ('-l'):
+            locality = int(arg)
 
     init()
 
