@@ -14,7 +14,7 @@ import getopt
 import json
 import sys
 
-DEBUG = False
+DEBUG = True
 
 def print_results(epoch_n, loss, validation_accuracy, acc):
     if DEBUG:
@@ -160,16 +160,20 @@ def main():
         FC_N_EPOCHS = int(config['machine_learning']['NetFC_1']['FC_N_EPOCHS'])
         FC_BATCH_SIZE = int(config['machine_learning']['NetFC_1']['FC_BATCH_SIZE'])
         FC_LEARNING_RATE = float(config['machine_learning']['NetFC_1']['FC_LEARNING_RATE'])
-
         C2R3_N_EPOCHS = int(config['machine_learning']['NetCNN_conv2_relu3']['C2R3_N_EPOCHS'])
         C2R3_BATCH_SIZE = int(config['machine_learning']['NetCNN_conv2_relu3']['C2R3_BATCH_SIZE'])
         C2R3_LEARNING_RATE = float(config['machine_learning']['NetCNN_conv2_relu3']['C2R3_LEARNING_RATE'])
+        CR3R3_N_EPOCHS = int(config['machine_learning']['NetCNN_convrelu3_relu3']['CR3R3_N_EPOCHS'])
+        CR3R3_BATCH_SIZE = int(config['machine_learning']['NetCNN_convrelu3_relu3']['CR3R3_N_EPOCHS'])
+        CR3R3_LEARNING_RATE = float(config['machine_learning']['NetCNN_convrelu3_relu3']['CR3R3_LEARNING_RATE'])
     
-    stop_at_N_epochs = stop_at_N_epochs_closure(C2R3_N_EPOCHS)
+    federated.set_device("cuda:2")
+
+    stop_at_N_epochs = stop_at_N_epochs_closure(CR3R3_N_EPOCHS)
     stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
-    get_unified_train_loader = data_loader.get_unified_train_loader_closure(C2R3_BATCH_SIZE)
-    central_learning(nn_architectures.NetCNN_convrelu3_relu3, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_epoch_saturation, C2R3_LEARNING_RATE)
+    # get_unified_train_loader = data_loader.get_unified_train_loader_closure(CR3R3_BATCH_SIZE)
+    # central_learning(nn_architectures.NetCNN_convrelu3_relu3, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_N_epochs_closure, CR3R3_LEARNING_RATE)
     
     # get_random_partitioned_train_loaders = data_loader.get_random_partitioned_train_loaders_closure(FC_BATCH_SIZE)
     # fed_learning(nn_architectures.NetFC_1, get_random_partitioned_train_loaders, data_loader.get_random_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
@@ -180,11 +184,11 @@ def main():
     # fed_learning(nn_architectures.NetFC_1, get_unbalanced_partitioned_train_loaders, data_loader.get_unified_test_loader, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
     # local_learning(nn_architectures.NetFC_1, get_unbalanced_partitioned_train_loaders, data_loader.get_unbalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
 
-    # balance_percentage = 0
-    # get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, FC_BATCH_SIZE)   
-    # get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
-    # optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = fed_learning(nn_architectures.NetFC_1, get_semibalanced_partitioned_train_loader, 
-    #     get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, FC_LEARNING_RATE)
+    balance_percentage = 0
+    get_semibalanced_partitioned_train_loader = data_loader.get_semibalanced_partitioned_train_loaders_closure(balance_percentage, CR3R3_BATCH_SIZE)   
+    get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
+    optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = fed_learning(nn_architectures.NetCNN_convrelu3_relu3, get_semibalanced_partitioned_train_loader, 
+        get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, CR3R3_LEARNING_RATE)
 
 if __name__ == "__main__":
     main()
