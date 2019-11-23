@@ -69,6 +69,23 @@ def fill_unbalanced_set(train_dataset, paritioned_target_sets, total_size, N_par
 
     return index
 
+def fill_selective_unbalanced_set(train_dataset, paritioned_target_sets, total_size, N_partitions, partition_cutoffs, similar_count, index):
+    modular_index = [0 for i in range(similar_count)]
+    for i in range(total_size):
+        item = train_dataset.__getitem__(index)
+        index = index + 1
+        for i in range(int(N_partitions/similar_count)-1):
+            if ((partition_cutoffs[i] <= item[1]) and (item[1] < partition_cutoffs[i+1])):
+                target_index = similar_count * i + modular_index[i]
+                paritioned_target_sets[target_index].__add__(item)
+                modular_index[i] = (modular_index[i] + 1) % similar_count
+        if (partition_cutoffs[int(N_partitions/similar_count)-1] <= item[1]):
+            target_index = similar_count * (int(N_partitions/similar_count)-1) + modular_index[similar_count-1]
+            paritioned_target_sets[target_index].__add__(item)
+            modular_index[similar_count-1] = (modular_index[similar_count-1] + 1) % similar_count
+
+    return index
+
 def get_unified_train_loader_closure(batch_size):
     def get_unified_train_loader(polymorphism_filler):
         train_dataset = get_train_datasets()
@@ -156,6 +173,35 @@ def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced, batc
         return (train_loaders, validation_loaders)
 
     return get_semibalanced_partitioned_train_loaders
+
+def get_selective_aggregation_train_loaders_closure(percentage_balanced, batch_size, similar_count):
+    def get_selective_aggregation_train_loaders(N_partitions): #N_partitions is the total num of nodes. 3 dist x 3 similar = 9 N_partition
+        train_dataset = get_train_datasets()
+
+        partitioned_validation_sets = [PartitionedDataset() for n in range(N_partitions)] # all sets are the same 10k to calculate node distance
+        paritioned_train_sets = [PartitionedDataset() for n in range(N_partitions)]
+
+        validation_balanced_partition_size = VALIDATION_SIZE
+
+        total_size = math.floor((len(train_dataset) - VALIDATION_SIZE))
+        balanced_size = math.floor((total_size * percentage_balanced) / 100)
+        balanced_partition_size = math.floor(balanced_size / N_partitions)
+        unbalanced_size = total_size - balanced_size
+        partition_cutoffs = [(math.floor(10 / (int(N_partitions/similar_count))) * i) for i in range(0, int(N_partitions/similar_count))]
+
+        index = 0
+        for i in range(N_partitions):
+            index = 0
+            index = fill_set_straight(train_dataset, partitioned_validation_sets[i], validation_balanced_partition_size, index)
+        index = fill_random_set(train_dataset, paritioned_train_sets, balanced_partition_size, N_partitions, index)
+        index = fill_selective_unbalanced_set(train_dataset, paritioned_train_sets, unbalanced_size, N_partitions, partition_cutoffs, similar_count, index)
+
+        train_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True) for dataset in paritioned_train_sets]
+        validation_loaders = [torch.utils.data.DataLoader(dataset=dataset, batch_size=VALIDATION_SIZE, shuffle=False) for dataset in partitioned_validation_sets]
+
+        return (train_loaders, validation_loaders)
+
+    return get_selective_aggregation_train_loaders
 
 def get_semibalanced_partitioned_test_loaders_closure(percentage_balanced):
     def get_semibalanced_partitioned_test_loaders(N_partitions):

@@ -15,25 +15,14 @@ if torch.cuda.is_available():
 torch.manual_seed(random.random() * 100)
 
 class Local_Model:
-    def __init__(self, network_architecture, get_train_loader, get_test_loader, N_partitions, node_id, learning_rate):
+    def __init__(self, network_architecture, train_loader, validation_loader, test_loader, N_partitions, learning_rate):
         with open('config.json') as config_file:
             config = json.load(config_file)
             DATA_PARALLEL = config['machine_learning']['DATA_PARALLEL']
-
-        train_loaders, validation_loaders = get_train_loader(N_partitions)
-        test_loaders = get_test_loader(N_partitions)
         
-        self.test_loader = test_loaders
-        if(N_partitions != 0):
-            self.test_loader = test_loaders[node_id]
-
-        self.train_loader = train_loaders
-        if(N_partitions != 0):
-            self.train_loader = train_loaders[node_id] 
-
-        self.validation_loader = validation_loaders
-        if(N_partitions != 0):
-            self.validation_loader = validation_loaders[node_id]
+        self.train_loader = train_loader
+        self.validation_loader = validation_loader
+        self.test_loader = test_loader
 
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
@@ -69,6 +58,9 @@ class Local_Model:
     def get_validation_accuracy(self):
         return evaluate.accuracy(self.model, self.validation_loader)
 
+    def get_selective_aggregation_vector(self):
+        return evaluate.selective_aggregating_vector(self.model, self.validation_loader)
+
     def get_loss(self):
         loss = evaluate.loss(self.model, self.train_loader, self.loss_fn)
         return loss
@@ -77,8 +69,7 @@ class Local_Model:
         return self.model
     
 class Aggregated_Model:
-    def __init__(self, network_architecture, get_test_loader, N_partitions):
-        self.test_loader = get_test_loader(N_partitions)
+    def __init__(self, network_architecture, N_partitions):
         self.model = network_architecture().to(device=DEVICE)
         self.loss_fn = nn.NLLLoss()
 
@@ -94,10 +85,6 @@ class Aggregated_Model:
                     w_global.data += w_local.data / N_partitions
     
         return self.model.parameters()
-
-    def get_accuracy(self):
-        acc = evaluate.accuracy(model=self.model, data_loader=self.test_loader)
-        return acc
 
     def get_params(self):
         return self.model.parameters()
