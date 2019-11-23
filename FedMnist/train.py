@@ -283,8 +283,7 @@ def main():
 
     federated.set_device("cuda:0")
 
-    # stop_at_N_epochs = stop_at_N_epochs_closure(FC_N_EPOCHS)
-    stop_at_N_epochs = stop_at_N_epochs_closure(2)
+    stop_at_N_epochs = stop_at_N_epochs_closure(CR3R3_N_EPOCHS)
     stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
     # get_unified_train_loader = data_loader.get_unified_train_loader_closure(FC_BATCH_SIZE)
