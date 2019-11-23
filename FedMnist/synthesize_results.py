@@ -306,7 +306,7 @@ def main():
             synthesize_balanced = synthesize_balanced_closure(LOCAL_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
                 C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.local_learning)
         if (3 == locality):
-            synthesize_balanced = synthesize_balanced_closure(SELECTIVE_FED_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
+            synthesize_balanced = synthesize_selective_aggregation_balanced_closure(SELECTIVE_FED_NETC2R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_conv2_relu3, 
                 C2R3_N_EPOCHS, C2R3_BATCH_SIZE, C2R3_LEARNING_RATE, train.selective_aggregation)
         
         synthesize_balanced(N_averaged, resolution, start_res)
@@ -332,7 +332,7 @@ def main():
             synthesize_balanced = synthesize_balanced_closure(LOCAL_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
                 CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.local_learning)
         if (3 == locality):
-            synthesize_balanced = synthesize_balanced_closure(SELECTIVE_FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+            synthesize_balanced = synthesize_selective_aggregation_balanced_closure(SELECTIVE_FED_NETCR3R3_TEST_BALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
                 CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.selective_aggregation)
             
         synthesize_balanced(N_averaged, resolution, start_res)
@@ -345,7 +345,7 @@ def main():
             synthesize_unbalanced = synthesize_unbalanced_closure(LOCAL_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
                 CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.local_learning)
         if (3 == locality):
-            synthesize_unbalanced = synthesize_unbalanced_closure(SELECTIVE_FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
+            synthesize_unbalanced = synthesize_selective_aggregation_unbalanced_closure(SELECTIVE_FED_NETCR3R3_TEST_UNBALANCED_FILE, nn_architectures.NetCNN_convrelu3_relu3, 
                 CR3R3_N_EPOCHS, CR3R3_BATCH_SIZE, CR3R3_LEARNING_RATE, train.selective_aggregation)
 
         synthesize_unbalanced(N_averaged, resolution, start_res)

@@ -176,14 +176,15 @@ def get_semibalanced_partitioned_train_loaders_closure(percentage_balanced, batc
 
 def get_selective_aggregation_train_loaders_closure(percentage_balanced, batch_size, similar_count):
     def get_selective_aggregation_train_loaders(N_partitions): #N_partitions is the total num of nodes. 3 dist x 3 similar = 9 N_partition
+        modified_validation_size = int(VALIDATION_SIZE / 2)
         train_dataset = get_train_datasets()
 
         partitioned_validation_sets = [PartitionedDataset() for n in range(N_partitions)] # all sets are the same 10k to calculate node distance
         paritioned_train_sets = [PartitionedDataset() for n in range(N_partitions)]
 
-        validation_balanced_partition_size = VALIDATION_SIZE
+        validation_balanced_partition_size = modified_validation_size
 
-        total_size = math.floor((len(train_dataset) - VALIDATION_SIZE))
+        total_size = math.floor((len(train_dataset) - modified_validation_size))
         balanced_size = math.floor((total_size * percentage_balanced) / 100)
         balanced_partition_size = math.floor(balanced_size / N_partitions)
         unbalanced_size = total_size - balanced_size
