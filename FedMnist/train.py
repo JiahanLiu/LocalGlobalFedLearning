@@ -132,12 +132,6 @@ def selective_aggregation(network_architecture, get_train_loaders, get_test_load
         sel_agg_vector = local_nets[i].get_selective_aggregation_vector()
         selective_aggregation_vectors.append(sel_agg_vector)
 
-    print(selective_aggregation_vectors[0].eq(selective_aggregation_vectors[1]).sum().item())
-    print(selective_aggregation_vectors[0].eq(selective_aggregation_vectors[2]).sum().item())
-    print(selective_aggregation_vectors[0].eq(selective_aggregation_vectors[3]).sum().item())
-    print(selective_aggregation_vectors[0].eq(selective_aggregation_vectors[4]).sum().item())
-    print(selective_aggregation_vectors[0].eq(selective_aggregation_vectors[5]).sum().item())
-
     groupings = []
     for i in range(len(selective_aggregation_vectors)):
         if(0 == len(groupings)):
@@ -150,8 +144,6 @@ def selective_aggregation(network_architecture, get_train_loaders, get_test_load
                     added = True
             if False == added:
                 groupings.append([i])
-
-    print(groupings)
 
     global_nets = [federated.Aggregated_Model(network_architecture, N_partitions) for i in range(len(groupings))]
 
