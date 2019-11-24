@@ -273,11 +273,10 @@ def main():
         SIMILAR_COUNT = int(config['machine_learning']['selective_aggregation']['SIMILAR_COUNT'])
         SIMULARITY_THRESHOLD = float(config['machine_learning']['selective_aggregation']['SIMULARITY_THRESHOLD'])
 
-    federated.set_device("cuda:0")
+    # federated.set_device("cuda:0")
 
-    # stop_at_N_epochs = stop_at_N_epochs_closure(CR3R3_N_EPOCHS)
-    stop_at_N_epochs = stop_at_N_epochs_closure(1)
-    stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
+    stop_at_N_epochs = stop_at_N_epochs_closure(CR3R3_N_EPOCHS)
+    # stop_at_epoch_saturation = stop_at_epoch_saturation_closure(MAX_EPOCHS, EPOCH_SATURATION)
 
     # get_unified_train_loader = data_loader.get_unified_train_loader_closure(FC_BATCH_SIZE)
     # (r_epoch, r_loss, r_val_acc, r_acc) = central_learning(nn_architectures.NetFC_1, get_unified_train_loader, data_loader.get_unified_test_loader, stop_at_N_epochs, FC_LEARNING_RATE)
@@ -292,7 +291,7 @@ def main():
     # optimal_epoch, opt_loss_i, opt_val_acc_i, opt_acc_i = fed_learning(nn_architectures.NetCNN_conv2_relu3, get_semibalanced_partitioned_train_loader, 
     #     get_semibalanced_partitioned_test_loaders, N_PARTITIONS, stop_at_N_epochs, C2R3_LEARNING_RATE)
 
-    balance_percentage = 5
+    balance_percentage = 50
     get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
     get_selective_aggregation_train_loaders = data_loader.get_selective_aggregation_train_loaders_closure(balance_percentage, CR3R3_BATCH_SIZE, similar_count=3)
     selective_aggregation(nn_architectures.NetCNN_convrelu3_relu3, get_selective_aggregation_train_loaders, get_semibalanced_partitioned_test_loaders, 
