@@ -239,5 +239,15 @@ Destination files to store results:
 ```
         "N_partitions": Number of paritions of data which in current version of code is same as number of nodes.
 ```
+## Branches
+
+| Branch Name     | Purpose    | 
+| ------------- |:-------------:|
+| master     | master | 
+| Deployment     | Deployment on Physical Devices | 
+| More_nodes     | Adding Support for More Nodes | 
+| Production     | Generates Federated Learning Research Results | 
+
+
 ## Papers
 - [Federated Learning Model Complexity vs Robustness to non-IID data and Selective Federated Learning](https://github.com/UT-MPC/LocalGlobalFedLearning/blob/master/Papers/ConfPaper.pdf)
