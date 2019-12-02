@@ -74,15 +74,15 @@ def fill_selective_unbalanced_set(train_dataset, paritioned_target_sets, total_s
     for i in range(total_size):
         item = train_dataset.__getitem__(index)
         index = index + 1
-        for i in range(int(N_partitions/similar_count)-1):
+        for i in range(int(similar_count)-1):
             if ((partition_cutoffs[i] <= item[1]) and (item[1] < partition_cutoffs[i+1])):
                 target_index = similar_count * i + modular_index[i]
                 paritioned_target_sets[target_index].__add__(item)
-                modular_index[i] = (modular_index[i] + 1) % similar_count
-        if (partition_cutoffs[int(N_partitions/similar_count)-1] <= item[1]):
-            target_index = similar_count * (int(N_partitions/similar_count)-1) + modular_index[similar_count-1]
+                modular_index[i] = (modular_index[i] + 1) % int(N_partitions/similar_count)
+        if (partition_cutoffs[int(similar_count)-1] <= item[1]):
+            target_index = similar_count * (int(similar_count)-1) + modular_index[similar_count-1]
             paritioned_target_sets[target_index].__add__(item)
-            modular_index[similar_count-1] = (modular_index[similar_count-1] + 1) % similar_count
+            modular_index[similar_count-1] = (modular_index[similar_count-1] + 1) % int(N_partitions/similar_count)
 
     return index
 
@@ -187,7 +187,7 @@ def get_selective_aggregation_train_loaders_closure(percentage_balanced, batch_s
         balanced_size = math.floor((total_size * percentage_balanced) / 100)
         balanced_partition_size = math.floor(balanced_size / N_partitions)
         unbalanced_size = total_size - balanced_size
-        partition_cutoffs = [(math.floor(10 / (int(N_partitions/similar_count))) * i) for i in range(0, int(N_partitions/similar_count))]
+        partition_cutoffs = [(math.floor(10 / (int(similar_count))) * i) for i in range(0, int(similar_count))]
 
         index = 0
         for i in range(N_partitions):

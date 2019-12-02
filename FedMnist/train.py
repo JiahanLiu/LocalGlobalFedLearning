@@ -293,9 +293,9 @@ def main():
 
     balance_percentage = 50
     get_semibalanced_partitioned_test_loaders = data_loader.get_semibalanced_partitioned_test_loaders_closure(balance_percentage)
-    get_selective_aggregation_train_loaders = data_loader.get_selective_aggregation_train_loaders_closure(balance_percentage, C2R3_BATCH_SIZE, similar_count=3)
-    selective_aggregation(nn_architectures.NetCNN_conv2_relu3, get_selective_aggregation_train_loaders, get_semibalanced_partitioned_test_loaders, 
-        SELECTIVE_AGGREGATION_N_PARTITIONS, stop_at_N_epochs, C2R3_BATCH_SIZE)
+    get_selective_aggregation_train_loaders = data_loader.get_selective_aggregation_train_loaders_closure(balance_percentage, FC_BATCH_SIZE, similar_count=3)
+    fed_learning(nn_architectures.NetFC_1, get_selective_aggregation_train_loaders, get_semibalanced_partitioned_test_loaders, 
+        SELECTIVE_AGGREGATION_N_PARTITIONS, stop_at_N_epochs, FC_BATCH_SIZE)
 
 if __name__ == "__main__":
     main()
